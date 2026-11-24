@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="tM34IT0dJ94dfZRdEdjNKt">
+<head data-page-node-id="cpq8Q4JGmXzyGr2YPuFio9">
+<meta charset="utf-8" data-page-node-id="Y5Bj2kEhR6vMsI2fJDCFwv">
+<meta name="viewport" content="width=device-width,initial-scale=1" data-page-node-id="UcXCDC6uuYfA5XLAtJIR7t">
+<title>影匣 · 本地影片库</title>
+<style>
+:root{
+  --bg:#0b0d10; --panel:#14171c; --panel2:#101317;
+  --line:rgba(255,255,255,.09); --txt:#e9ebee; --dim:#8b9298; --dim2:#666d73;
+  --gold:#e3b171; --gold2:#f2cf9b; --danger:#e26d5c;
+  --radius:12px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 560px at 10% -8%, rgba(227,177,113,.09), transparent 60%),
+    radial-gradient(900px 480px at 94% 0%, rgba(70,105,150,.08), transparent 60%),
+    var(--bg);
+  color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei UI","PingFang SC",sans-serif;
+  -webkit-font-smoothing:antialiased; min-height:100vh;
+}
+.wrap{max-width:1440px;margin:0 auto;padding:26px 30px 60px;display:flex;gap:36px;align-items:flex-start}
+.main{flex:1;min-width:0}
+h1,h2,h3{font-family:"Songti SC","Source Han Serif SC","SimSun",serif;font-weight:600}
+
+/* ── header ── */
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  padding-bottom:18px;border-bottom:1px solid var(--line)}
+.brand h1{font-size:40px;line-height:1;margin:0;letter-spacing:.16em;
+  background:linear-gradient(180deg,#fff 20%,#a8a49c 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.brand h1 .bt{font-size:20px;letter-spacing:.1em;margin-left:.4em;font-weight:500}
+.brand .sub{margin-top:10px;color:var(--dim);font-size:13px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.brand .sub b{color:var(--gold2);font-weight:600;font-variant-numeric:tabular-nums}
+.dot{width:4px;height:4px;border-radius:50%;background:#3a3f45}
+.tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.search{position:relative}
+.search input{width:220px;height:40px;border-radius:10px;border:1px solid var(--line);
+  background:rgba(255,255,255,.04);color:var(--txt);padding:0 14px 0 34px;font-size:16px;outline:none;transition:.2s}
+.search input:focus{border-color:rgba(227,177,113,.5);width:260px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;opacity:.5}
+.btn{height:40px;padding:0 15px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.045);
+  color:var(--txt);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.18s;
+  white-space:nowrap;font-family:inherit;letter-spacing:.02em}
+.btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(180deg,#f0c98f,#d9a865);border-color:#e0b57c;color:#1a1109;font-weight:600}
+.btn.primary:hover{background:linear-gradient(180deg,#f7d7a6,#e5b772)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--danger);border-color:rgba(226,109,92,.4)}
+.btn.danger:hover{background:rgba(226,109,92,.12)}
+.btn svg{width:15px;height:15px;opacity:.85}
+
+/* ── 左侧栏导航 ── */
+.side{flex:0 0 216px;position:sticky;top:24px;display:flex;flex-direction:column;
+  min-height:calc(100vh - 90px)}
+.side .brand h1{font-size:30px}
+.snav{display:flex;flex-direction:column;gap:6px;margin-top:26px}
+.snav .tab{width:100%;height:40px;border-radius:10px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 14px}
+.snav .tab .n{margin-left:0}
+.sidefoot{margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:14px}
+.sidefoot .btn{width:100%;justify-content:center}
+.sstats{display:flex;flex-direction:column;gap:7px;font-size:12.5px;color:var(--dim);
+  border-top:1px solid var(--line);padding-top:16px}
+.sstats .row{display:flex;justify-content:space-between;gap:12px}
+.sstats b{color:var(--gold2);font-weight:600;font-variant-numeric:tabular-nums}
+.tab{height:36px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:transparent;
+  color:var(--dim);font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.05em;transition:.16s}
+.tab:hover{color:#fff;border-color:rgba(255,255,255,.22)}
+.tab.is-on{color:#1a1109;background:linear-gradient(180deg,#f0c98f,#d9a865);border-color:#e0b57c;font-weight:600}
+.tab .n{font-size:11px;opacity:.75;font-variant-numeric:tabular-nums;margin-left:4px}
+
+/* ── 筛选分组 ── */
+.fsection{margin-top:18px}
+.glab{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--dim2);
+  letter-spacing:.22em;margin-bottom:9px}
+.glab::after{content:"";flex:1;height:1px;background:var(--line)}
+.sdot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;margin:0 1px 0 3px}
+
+/* ── 侧栏观看热力图 ── */
+.hmap{margin-top:24px}
+.hgrid{position:relative;padding-top:15px;display:flex;gap:3px}
+.hdays{display:flex;flex-direction:column;justify-content:space-between;width:13px;flex:0 0 13px;height:75px}
+.hdays span{height:9px;line-height:9px;font-size:9px;color:var(--dim2)}
+.hcols{display:flex;gap:2px}
+.hcol{display:flex;flex-direction:column;gap:2px}
+.hcell{width:9px;height:9px;border-radius:2.5px;background:rgba(255,255,255,.055)}
+.hcell.l1{background:#1e4423}
+.hcell.l2{background:#2d6b31}
+.hcell.l3{background:#3f9440}
+.hcell.l4{background:#5cc95b}
+.hcell.future{background:transparent}
+.hcell.today{box-shadow:0 0 0 1px rgba(227,177,113,.75)}
+.hmonths{position:absolute;top:0;left:16px;right:0;height:13px}
+.hmonths span{position:absolute;top:0;font-size:10px;color:var(--dim2);white-space:nowrap;letter-spacing:.05em}
+.hsum{margin-top:9px;font-size:11px;color:var(--dim2);line-height:1.5}
+.hsum b{color:var(--gold2);font-weight:600}
+
+/* ── filter bar ── */
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 4px}
+.chip{height:30px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:transparent;
+  color:var(--dim);font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.16s;font-family:inherit}
+.chip:hover{color:#fff;border-color:rgba(255,255,255,.22)}
+.chip.is-on{color:#1a1109;background:linear-gradient(180deg,#f0c98f,#d9a865);border-color:#e0b57c;font-weight:600}
+.chip .n{font-size:11px;opacity:.72;font-variant-numeric:tabular-nums}
+.spacer{flex:1}
+.sortsel{height:30px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  color:var(--dim);font-size:12.5px;padding:0 10px;outline:none;cursor:pointer;font-family:inherit}
+
+/* ── grid & cards ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:20px 15px;margin-top:18px}
+.cell{position:relative;border:0;background:none;cursor:pointer;padding:0;text-align:left;font-family:inherit;color:inherit;width:100%}
+.frame{position:relative;aspect-ratio:2/3;border-radius:var(--radius);overflow:hidden;background:#15181d;
+  border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 26px -16px #000;
+  transition:transform .25s,box-shadow .25s,border-color .25s}
+.frame img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s}
+.cell:hover .frame{transform:translateY(-4px);border-color:rgba(227,177,113,.38);box-shadow:0 20px 40px -16px #000}
+.cell:hover .frame img{transform:scale(1.05)}
+.noposter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+  background:repeating-linear-gradient(135deg,#15181c,#15181c 12px,#1b1f24 12px,#1b1f24 24px);color:var(--dim2)}
+.noposter svg{width:30px;height:30px;opacity:.45}
+.noposter .ph-t{font-size:12px;letter-spacing:.14em;color:#c3cbd2}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.82))}
+.cap h3{margin:0;font-size:13.5px;letter-spacing:.02em;line-height:1.35;color:#fff;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.cap p{margin:4px 0 0;font-size:11px;color:#a8adb3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seen{position:absolute;top:9px;right:9px;font-size:10.5px;padding:3px 7px;border-radius:5px;
+  background:rgba(227,177,113,.16);border:1px solid rgba(227,177,113,.5);color:var(--gold2)}
+.seen.st-want{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.5);color:#c4b5fd}
+.seen.st-ing{background:rgba(96,165,250,.14);border-color:rgba(96,165,250,.5);color:#93c5fd}
+.starr{display:inline-flex;gap:2px;align-items:center;vertical-align:middle}
+.starr svg{width:15px;height:15px}
+.starr .on{fill:var(--gold2)}
+.starr .off{fill:#3a3f45}
+.reviewbox{border:1px solid var(--line);border-radius:10px;background:#15181d;
+  padding:10px 12px;font-size:12.5px;color:#c9ced3;line-height:1.7;white-space:pre-wrap}
+/* actor card */
+.acard{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 10px 14px;
+  border:1px solid var(--line);border-radius:var(--radius);background:var(--panel2);transition:.2s}
+.acard:hover{border-color:rgba(227,177,113,.38);transform:translateY(-3px)}
+.avatar{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:600;color:#1a1109;background:linear-gradient(180deg,#f0c98f,#d9a865);
+  font-family:"Songti SC","SimSun",serif;flex:0 0 auto}
+.avatar.f{background:linear-gradient(180deg,#e8b7c6,#d2879f)}
+.acard h3{margin:0;font-size:14px;color:#fff;letter-spacing:.04em}
+.acard p{margin:0;font-size:11.5px;color:var(--dim)}
+.empty{grid-column:1/-1;text-align:center;color:var(--dim2);padding:80px 20px;font-size:14px;letter-spacing:.08em}
+
+/* ── footer ── */
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;
+  font-size:11.5px;color:var(--dim2);letter-spacing:.04em}
+.foot b{color:#9aa0a6;font-weight:400}
+
+/* ── modal ── */
+.mask{position:fixed;inset:0;background:rgba(3,4,5,.72);backdrop-filter:blur(6px);z-index:60;
+  display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:.2s}
+.mask.on{opacity:1;pointer-events:auto}
+.sheet{width:min(880px,100%);max-height:90vh;overflow:auto;background:linear-gradient(180deg,#13161a,#0d0f12);
+  border:1px solid var(--line);border-radius:16px;box-shadow:0 40px 90px -30px #000;position:relative;
+  transform:translateY(10px);transition:.22s}
+.mask.on .sheet{transform:none}
+.sheet.slim{width:min(560px,100%)}
+.sheet .x{position:absolute;right:12px;top:11px;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:#cfd4d8;cursor:pointer;font-size:15px;line-height:1;z-index:2}
+.sheet .x:hover{background:rgba(255,255,255,.12)}
+.detail{display:grid;grid-template-columns:1.05fr 1fr}
+.detail .visual{position:relative;background:#000;min-height:320px;display:flex;align-items:center;justify-content:center}
+.detail .visual img{width:100%;height:100%;object-fit:cover}
+.detail .info{padding:24px 24px 20px}
+.detail h2{font-size:24px;margin:0 0 6px;letter-spacing:.03em}
+.detail .meta{color:var(--dim);font-size:12.5px;margin-bottom:14px;letter-spacing:.04em}
+.detail .note{color:#b9bfc4;font-size:13px;line-height:1.85;margin:0 0 16px;white-space:pre-wrap}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:12px;margin-bottom:16px}
+.kv .k{color:var(--dim2);white-space:nowrap}
+.kv .v{color:#dcdfe2;word-break:break-all;font-variant-numeric:tabular-nums}
+.copy{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;font-size:11px;
+  padding:2px 8px;cursor:pointer;margin-left:8px;font-family:inherit}
+.copy:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts .btn{height:36px;font-size:12.5px}
+.secttl{font-size:11.5px;color:var(--dim2);letter-spacing:.14em;margin:14px 0 8px}
+.starchips{display:flex;gap:7px;flex-wrap:wrap}
+.starchip{font-size:12.5px;padding:5px 12px;border-radius:999px;border:1px solid rgba(227,177,113,.35);
+  color:var(--gold2);cursor:pointer;background:rgba(227,177,113,.08);font-family:inherit}
+.starchip:hover{background:rgba(227,177,113,.2)}
+.minifilms{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px 10px;margin-top:6px}
+.minifilm{cursor:pointer;text-align:left;padding:0;border:0;background:none;font-family:inherit;color:inherit}
+.minifilm .mf{aspect-ratio:2/3;border-radius:8px;overflow:hidden;background:#15181d;border:1px solid var(--line);position:relative}
+.minifilm img{width:100%;height:100%;object-fit:cover}
+.minifilm span{display:block;font-size:11.5px;color:#c9ced3;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* form */
+.form{padding:26px 26px 22px}
+.form h2{font-size:21px;margin:0 0 16px}
+.fld{margin-bottom:13px}
+.fld label{display:block;font-size:11.5px;color:var(--dim2);letter-spacing:.1em;margin-bottom:6px}
+.fld input[type=text],.fld input[type=number],.fld input[type=date],.fld textarea,.fld select{
+  width:100%;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.045);
+  color:var(--txt);padding:9px 12px;font-size:16px;outline:none;font-family:inherit}
+.fld textarea{min-height:88px;resize:vertical;line-height:1.7}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:rgba(227,177,113,.5)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.coverbox{display:flex;gap:12px;align-items:center}
+.coverbox .cthumb{width:64px;height:92px;border-radius:8px;overflow:hidden;background:#15181d;
+  border:1px solid var(--line);flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--dim2);font-size:11px}
+.coverbox .cthumb img{width:100%;height:100%;object-fit:cover}
+.coverbtns{display:flex;flex-direction:column;gap:7px}
+.coverbtns .btn{height:32px;font-size:12px}
+.actorpick{border:1px solid var(--line);border-radius:10px;padding:12px}
+.picked{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.picked .pk{font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(227,177,113,.12);
+  border:1px solid rgba(227,177,113,.4);color:var(--gold2);display:inline-flex;align-items:center;gap:6px}
+.picked .pk i{font-style:normal;cursor:pointer;opacity:.7}
+.picked .pk i:hover{opacity:1}
+.pickrow{display:flex;gap:8px;flex-wrap:wrap}
+.pickrow select,.pickrow input{flex:1 1 130px;min-width:0;border-radius:8px;border:1px solid var(--line);
+  background:rgba(255,255,255,.045);color:var(--txt);padding:7px 10px;font-size:16px;outline:none;font-family:inherit}
+.pickrow .btn{height:34px;font-size:12px}
+.facts{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}
+.menu{padding:14px;display:flex;flex-direction:column;gap:8px}
+.menu .btn{justify-content:flex-start}
+.hintbox{font-size:12.5px;color:#b9bfc4;line-height:2;margin-bottom:16px}
+.hintbox b{color:var(--gold2)}
+/* ── 演员照片与资料增强 ── */
+.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.bigavatar{width:150px;height:150px;border-radius:50%;overflow:hidden;flex:0 0 auto;
+  border:2px solid rgba(227,177,113,.35);box-shadow:0 10px 26px -14px #000}
+.bigavatar img{width:100%;height:100%;object-fit:cover;display:block}
+.bigavatar .ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:52px;font-weight:600;color:#1a1109;background:linear-gradient(180deg,#f0c98f,#d9a865);
+  font-family:"Songti SC","SimSun",serif}
+.kvgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px;margin-bottom:14px}
+.kvgrid .kv{margin-bottom:0}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:10px;margin-top:6px}
+.photo-item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1/1;border:1px solid var(--line);background:#15181d}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.photo-item .pacts{position:absolute;left:0;right:0;bottom:0;display:flex;gap:3px;padding:4px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.82));opacity:0;transition:.15s}
+.photo-item:hover .pacts{opacity:1}
+.pbtn{flex:1;height:22px;border-radius:5px;border:1px solid rgba(255,255,255,.18);background:rgba(20,22,26,.85);
+  color:#dfe2e5;font-size:10.5px;cursor:pointer;font-family:inherit;padding:0}
+.pbtn:hover{border-color:rgba(227,177,113,.6);color:var(--gold2)}
+.pbtn.del:hover{color:var(--danger);border-color:rgba(226,109,92,.6)}
+.covmark{position:absolute;top:4px;left:4px;font-size:10px;padding:2px 6px;border-radius:4px;
+  background:rgba(227,177,113,.85);color:#1a1109;font-weight:600}
+.lightbox{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.92);display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.lightbox.on{display:flex}
+.lightbox img{max-width:86vw;max-height:78vh;border-radius:8px;object-fit:contain}
+.lightbox .lb-acts{display:flex;gap:10px;align-items:center}
+.lightbox .lb-idx{color:var(--dim);font-size:12.5px;font-variant-numeric:tabular-nums}
+.vfile{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;font-size:12.5px;color:#c9ced3;flex-wrap:wrap}
+.vfile b{color:var(--txt);font-weight:600;word-break:break-all}
+.vfile .btn{height:30px;font-size:11.5px;flex:0 0 auto}
+@media (max-width:760px){.kvgrid{grid-template-columns:1fr}}
+/* 影片表单：发行日期 / 类型多选 / 已看勾选 */
+.daterow{display:flex;gap:8px;flex-wrap:wrap}
+.daterow select{flex:1 1 90px;min-width:0;border-radius:8px;border:1px solid var(--line);
+  background:#15181d;color:var(--txt);padding:9px 10px;font-size:13px;outline:none}
+.daterow select:focus{border-color:var(--gold)}
+.daterow select:disabled{opacity:.4;cursor:not-allowed}
+.gchips{display:flex;gap:8px;flex-wrap:wrap}
+.gchip{font-size:12.5px;padding:6px 14px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:transparent;color:var(--dim);transition:all .15s}
+.gchip:hover{border-color:var(--gold);color:var(--gold2)}
+.gchip.is-on{background:rgba(227,177,113,.14);border-color:var(--gold);color:var(--gold2)}
+.gnewrow{display:flex;gap:8px;margin-top:8px}
+.gnewrow input{flex:1 1 140px;min-width:0;border-radius:8px;border:1px solid var(--line);
+  background:#15181d;color:var(--txt);padding:8px 10px;font-size:12.5px;outline:none}
+.gnewrow input:focus{border-color:var(--gold)}
+.gnewrow .btn{height:34px;font-size:12px;flex:0 0 auto}
+.chkrow{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#c9ced3;user-select:none}
+.chkrow input{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+.watched-cta{border-color:var(--gold);color:var(--gold2)}
+.watched-cta:hover{background:rgba(227,177,113,.12)}
+/* toast */
+.toast{position:fixed;left:50%;bottom:36px;transform:translate(-50%,14px);z-index:90;
+  background:rgba(20,22,26,.96);border:1px solid rgba(255,255,255,.14);color:#eef0f2;
+  padding:11px 18px;border-radius:10px;font-size:12.5px;opacity:0;pointer-events:none;transition:.25s;max-width:80vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.err{border-color:rgba(226,109,92,.5);color:#f2b0a6}
+
+@media (max-width:920px){
+  .wrap{flex-direction:column;gap:0}
+  .side{position:static;flex:none;width:100%;min-height:0;flex-direction:row;align-items:center;flex-wrap:wrap;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  .snav{flex-direction:row;margin-top:0;flex:1 1 auto}
+  .snav .tab{width:auto;height:34px;padding:0 14px}
+  .sidefoot{margin-top:0;padding-top:0;flex-direction:row;align-items:center;flex:0 0 auto}
+  .sstats{display:none}
+  .sidefoot .btn{width:auto}
+}
+@media (max-width:760px){
+  .detail{grid-template-columns:1fr}.detail .visual{min-height:200px}
+  .wrap{padding:16px 14px 40px}
+  .brand h1{font-size:30px}.brand h1 .bt{font-size:15px}
+  .search{flex:1 1 100%}.search input{width:100%}
+  .tools .btn{flex:1 1 auto;justify-content:center}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px 11px}
+  .frow{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-page-node-id="YAwQqUe29xNLvxOPeQtY0S">
+<div class="wrap" data-page-node-id="awt7lQS9MMkwwt3pXldbHg">
+  <aside class="side" data-page-node-id="iMIWLazGRzd7NBQssimhHI">
+    <div class="brand" data-page-node-id="CKPS3tcz1mQrPoPto79ZXE">
+      <h1 data-page-node-id="aGwRMs3wv4Xez6yCKmvMwa">影匣<span class="bt" data-page-node-id="TFcZ3vi29Y1FjSksRdskjb">本地影片库</span></h1>
+    </div>
+    <nav class="snav" data-page-node-id="aXGB6PhVVJa9R5Uxh3mjun">
+      <button class="tab is-on" id="tabMovies" type="button" data-page-node-id="CU8QxVyDUbcTaTohMtBUQm">影片库<span class="n" id="nMovies" data-page-node-id="Nf8MZ5Z8WYI7gN0xx3udre"></span></button>
+      <button class="tab" id="tabSeries" type="button" data-page-node-id="eS2OLP7gOskBJUoQRJGblT">剧集库<span class="n" id="nSeries" data-page-node-id="Bj0EI0B7R5QknvQgxSIbwV"></span></button>
+      <button class="tab" id="tabActors" type="button" data-page-node-id="y20jGwVVMhdGjGSGdEtkYA">演员库<span class="n" id="nActors" data-page-node-id="w6FaOv6iAyddyLmdACDHMG"></span></button>
+    </nav>
+    <div class="hmap" id="hmapWrap">
+      <div class="glab">观看热力</div>
+      <div class="hgrid" id="hgrid"></div>
+      <div class="hsum" id="hsum"></div>
+    </div>
+    <div class="sidefoot" data-page-node-id="MHAMHxU8DllbLhRuH10za8">
+      <div class="sstats" data-page-node-id="egKtKOMGWg2nl3F2EseXYn">
+        <div class="row" data-page-node-id="TurYjaMAe841DUUbXEMo5h"><span data-page-node-id="5w8YoSj2Dnurr91lH53kvn">影片</span><b id="ssMovies" data-page-node-id="B029gTHHHVZaR4JopfY36N">0</b></div>
+        <div class="row" data-page-node-id="rTcKHLEoCYKI4u1i3VEAy4"><span data-page-node-id="bal89oUGRpFEyE9eQfBlhC">剧集</span><b id="ssSeries" data-page-node-id="hBkxQ5a2n6dsdHgHmnp43m">0</b></div>
+        <div class="row" data-page-node-id="dj23JOqt3M5cfkNuQh1kCA"><span data-page-node-id="A7GvnJ90gyn30d7qiPBMgV">演员</span><b id="ssActors" data-page-node-id="LZAgkQJhgZlLXmoxhBpGOS">0</b></div>
+        <div class="row" data-page-node-id="dRo31ljys7HVjgBNJiaIoN"><span data-page-node-id="YEo8HJkXx6njiwoodVrm8U">总容量</span><b id="ssGB" data-page-node-id="2qPRNtMue68RrgrF2JTYZ5">0 GB</b></div>
+      </div>
+      <button class="btn ghost" id="btnData" data-page-node-id="BxZKRLneWQF4yz5a1r6vFe">数据 ▾</button>
+    </div>
+  </aside>
+
+  <div class="main" data-page-node-id="6U8OGu1MPA6mfaCE1BrXr6">
+  <header class="head" data-page-node-id="rfLCO0fq7luDZN30U3BKKq">
+    <div class="tools" data-page-node-id="ZpsTpM8pcm9Qd8HLW9d0Fb">
+      <div class="search" data-page-node-id="2L6wibPxWMZoypJ75zGrvZ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="9ju1emppuaF7x0uDmnFAGb"><circle cx="11" cy="11" r="7" data-page-node-id="YiOjm4NxrWlpfUkWzK5hO3"></circle><path d="M20 20l-4-4" data-page-node-id="9RZwVoC5eBlbtDMn8soz4k"></path></svg>
+        <input id="q" type="search" placeholder="搜索片名 / 剧名 / 演员 / 简介" autocomplete="off" data-page-node-id="b8NHaKvyRBKnMOZhiLGYS6">
+      </div>
+      <button class="btn primary" id="btnAddMovie" data-page-node-id="QBHNUpLSEnjoo5H273So0U">＋ 影片</button>
+      <button class="btn" id="btnAddSeries" data-page-node-id="PPE8lSopqQgwuyJGMumyL6">＋ 剧集</button>
+      <button class="btn" id="btnAddActor" data-page-node-id="uANNWnHWwSlrr76zfeEiXY">＋ 演员</button>
+    </div>
+  </header>
+
+  <div id="chips" data-page-node-id="k5BiXxoSk28FkWjNnRwEZx">
+    <div class="fsection" data-page-node-id="Vu5MDFdqAaZHAN3DKBDkBB">
+      <div class="glab" data-page-node-id="EoaiFjz58oGtD5UCclTeoE">内容类型</div>
+      <div class="bar" id="genreChipsBar" style="margin:0" data-page-node-id="IYqBNhaoRfaBNr34JLxyWO"></div>
+    </div>
+    <div class="fsection" data-page-node-id="BLfOf7CKD36CMPBMrlztxe">
+      <div class="glab" data-page-node-id="OL6UesnYhRMiKi6e1Xp2oZ">观看状态</div>
+      <div class="bar" id="statusChips" style="margin:0" data-page-node-id="0zy0LDql7hE4c4EBwVJAH6"></div>
+    </div>
+    <div class="fsection">
+      <div class="glab">国家 / 地区</div>
+      <div class="bar" id="countryChipsBar" style="margin:0"></div>
+    </div>
+  </div>
+  <div class="bar" style="margin-top:0" data-page-node-id="lLriC8307um6VZ1x8R0aJB">
+    <span class="spacer" data-page-node-id="4Iv5hlv4w4n6vpsk5LFv0K"></span>
+    <button class="btn ghost" id="btnMatch" type="button" style="height:30px;font-size:12px" data-page-node-id="iWdgke75Btv0ErJnUHDSyT">按片名匹配封面</button>
+    <select class="sortsel" id="sort" data-page-node-id="o1k3BAZx1OhfTFjvgckLPN">
+      <option value="added" data-page-node-id="IgekPf1Br9WbazrUXdFNEf">按录入时间（新→旧）</option>
+      <option value="name" data-page-node-id="mRXj4FmMLgVzw6ZnZuawVq">按片名</option>
+      <option value="gb" data-page-node-id="hwJuFXKpiFWIl5CYqAfMSz">按容量（大→小）</option>
+      <option value="year" data-page-node-id="RtQPcXv18STSOnEvgzPske">按年份（新→旧）</option>
+      <option value="rating" data-page-node-id="iyDX2wneQqXOh9WUNm9NE3">按评分（高→低）</option>
+    </select>
+  </div>
+
+  <div class="grid" id="grid" data-page-node-id="xOxsDsAAzsWiRG02CCW4g5"></div>
+  <div class="grid" id="seriesGrid" hidden data-page-node-id="NtHGH5beBMLaL76ZON75FJ"></div>
+  <div class="grid" id="actorGrid" hidden data-page-node-id="tQcb5uPcyst8WnZct8EvFN"></div>
+
+  <footer class="foot" data-page-node-id="zzCK5AtLDwVRwAb2sNStMp">
+    <span data-page-node-id="BMBQichecFtRAHFoUFV9Ga">影片与演员数据手动维护，双击本文件即可打开使用</span>
+    <span data-page-node-id="DdFyHb4NMteaa6lg5BmKdt">数据保存于本机浏览器；<b data-page-node-id="xUemDGRaqaqtpNwJGkjLKr">换电脑或清理浏览器前，请先用「数据 ▾ → 导出备份」留档</b></span>
+  </footer>
+  </div>
+</div>
+
+<div class="mask" id="mask" data-page-node-id="86GQSMmb5w5B7LEf1bTlTL"><div class="sheet" id="sheet" data-page-node-id="Shd5SXgcwCMh7MpDGEvAYQ"></div></div>
+
+<input id="posterMatch" type="file" accept=".jpg,.jpeg,.png,.webp" multiple hidden data-page-node-id="nZ3Cbc5SfYW1uYVxA1RpWv">
+<input id="posterSingle" type="file" accept=".jpg,.jpeg,.png,.webp" hidden data-page-node-id="QqXYwcQrX88xCbxmScCXdq">
+<input id="avatarPick" type="file" accept=".jpg,.jpeg,.png,.webp" hidden data-page-node-id="t1dFCzAq7NEaCiEzZMZvtH">
+<input id="photoPick" type="file" accept=".jpg,.jpeg,.png,.webp" multiple hidden data-page-node-id="n8V4z0oJForF9A8nKOo2uD">
+<input id="videoPick" type="file" accept="video/*,.mkv,.avi,.rmvb,.wmv,.flv,.ts,.m2ts,.mpg,.mpeg" hidden data-page-node-id="KSqIWL2tl5cMkcQGuFuYrg">
+<input id="videoPlayPick" type="file" accept="video/*,.mkv,.avi,.rmvb,.wmv,.flv,.ts,.m2ts,.mpg,.mpeg" hidden data-page-node-id="syZHDGpJigfRqaIE77wtOA">
+<input id="importPick" type="file" accept=".json" hidden data-page-node-id="wwPQ2lBp0v91i8o9V8EPVN">
+
+<div class="lightbox" id="lightbox" data-page-node-id="GEPC8X9wSvOTXEMXGb66ZG"></div>
+<div class="toast" id="toast" data-page-node-id="qlB5WbCRc9LvE5stQCqUSi"></div>
+
+<script type="application/json" id="lib-data">{"movies":[],"actors":[]}</script>
+<script type="application/json" id="seed-data">{"movies":[
+{"id":"m1","title":"肖申克的救赎","year":"1994","releaseDate":"1994","country":"美国","director":"弗兰克·德拉邦特","genre":"剧情/犯罪","path":"F:\\Movies\\肖申克的救赎\\肖申克的救赎.1994.1080p.mkv","sizeGb":2.4,"synopsis":"银行家安迪蒙冤入狱，用近二十年时间凿开希望之路，完成自我救赎。信念、自由与友谊的经典之作。","cover":"","actors":["a1","a2"],"added":1731990000000,"status":"已看","watched":true,"rating":9.5,"stars":5,"review":"影史第一的救赎之作，节奏沉稳，结尾的力量足以反复回味。","watchDate":"2026-11-21","video":{"name":"肖申克的救赎.1994.1080p.mkv","size":2576980378,"ext":"mkv","lastModified":1731900000000}},
+{"id":"m2","title":"盗梦空间","year":"2010","releaseDate":"2010-09-01","country":"美国","director":"克里斯托弗·诺兰","genre":"科幻/悬疑","path":"F:\\Movies\\盗梦空间\\Inception.2010.BluRay.mkv","sizeGb":3.8,"synopsis":"造梦师柯布率团队潜入多层梦境完成植入意念的任务，现实与梦境层层嵌套，结尾的陀螺成为影史著名悬念。","cover":"","actors":["a3","a4"],"added":1731980000000,"status":"已看","watched":true,"rating":9.0,"stars":5,"watchDate":"2026-11-08"},
+{"id":"m3","title":"星际穿越","year":"2014","releaseDate":"2014-11-12","country":"美国","director":"克里斯托弗·诺兰","genre":"科幻/冒险","path":"F:\\Movies\\星际穿越\\Interstellar.2014.mkv","sizeGb":2.9,"synopsis":"地球濒临绝境，前宇航员库珀穿越虫洞为人类寻找新家园，父女之情贯穿于宏大的时空叙事之中。","cover":"","actors":["a5"],"added":1731970000000,"status":"在看","watched":false,"rating":8.8,"stars":4},
+{"id":"m4","title":"让子弹飞","year":"2010","releaseDate":"2010-12-16","country":"中国","director":"姜文","genre":"剧情/喜剧","path":"F:\\Movies\\让子弹飞\\让子弹飞.2010.mkv","sizeGb":1.6,"synopsis":"北洋年间，土匪张麻子假扮县长进驻鹅城，与恶霸黄四郎斗智斗勇，台词犀利、隐喻丰富。","cover":"","actors":["a4b","a5b"],"added":1731960000000,"status":"已看","watched":true,"watchDate":"2026-10-26","video":{"name":"让子弹飞.2010.mkv","size":1717986918,"ext":"mkv","lastModified":1731900000000}},
+{"id":"m5","title":"摩登时代","year":"1936","releaseDate":"1936","country":"美国","director":"查理·卓别林","genre":"喜剧/剧情","path":"","sizeGb":0.7,"synopsis":"卓别林经典默片，以小人物在工业化流水线上的遭遇，幽默而深刻地讽刺了机器时代的异化。","cover":"","actors":[],"added":1731950000000,"status":"想看","watched":false}
+],"actors":[
+{"id":"a1","name":"蒂姆·罗宾斯","enName":"Tim Robbins","alias":"","gender":"男","birth":"1958-10-16","blood":"","country":"美国","birthplace":"美国·新泽西州","job":"演员 / 导演","agency":"","debut":"1980","bio":"美国演员、导演，代表作《肖申克的救赎》《神秘河》，曾凭后者获奥斯卡最佳男配角。","avatar":"","photos":[],"added":1731990000000},
+{"id":"a2","name":"摩根·弗里曼","enName":"Morgan Freeman","alias":"","gender":"男","birth":"1937-06-01","blood":"","country":"美国","birthplace":"美国·田纳西州","job":"演员","agency":"","debut":"1960","bio":"美国国宝级演员，嗓音极具辨识度，代表作《肖申克的救赎》《百万美元宝贝》，2005年获奥斯卡最佳男配角。","avatar":"","photos":[],"added":1731990000000},
+{"id":"a3","name":"莱昂纳多·迪卡普里奥","enName":"Leonardo DiCaprio","alias":"小李子","gender":"男","birth":"1974-11-11","blood":"","country":"美国","birthplace":"美国·洛杉矶","job":"演员","agency":"","debut":"1989","bio":"美国演员，代表作《泰坦尼克号》《盗梦空间》《荒野猎人》，2016年凭后者获奥斯卡最佳男主角。","avatar":"","photos":[],"added":1731990000000},
+{"id":"a4","name":"约瑟夫·高登-莱维特","enName":"Joseph Gordon-Levitt","alias":"","gender":"男","birth":"1981-02-17","blood":"","country":"美国","birthplace":"美国·洛杉矶","job":"演员","agency":"","debut":"1988","bio":"美国演员，代表作《盗梦空间》《和莎莫的500天》《环形使者》。","avatar":"","photos":[],"added":1731990000000},
+{"id":"a5","name":"马修·麦康纳","enName":"Matthew McConaughey","alias":"","gender":"男","birth":"1969-11-04","blood":"","country":"美国","birthplace":"美国·得克萨斯州","job":"演员","agency":"","debut":"1991","bio":"美国演员，代表作《星际穿越》《达拉斯买家俱乐部》，2014年获奥斯卡最佳男主角。","avatar":"","photos":[],"added":1731990000000},
+{"id":"a4b","name":"姜文","enName":"Jiang Wen","alias":"","gender":"男","birth":"1963-01-05","blood":"","country":"中国","birthplace":"中国·河北唐山","job":"导演 / 演员","agency":"","debut":"1985","bio":"中国导演、演员，作品风格浓烈张扬，代表作《让子弹飞》《阳光灿烂的日子》《鬼子来了》。","avatar":"","photos":[],"added":1731990000000},
+{"id":"a5b","name":"葛优","enName":"Ge You","alias":"","gender":"男","birth":"1957-04-19","blood":"","country":"中国","birthplace":"中国·北京","job":"演员","agency":"","debut":"1985","bio":"中国演员，戛纳影帝，喜剧表演自成一派，代表作《活着》《让子弹飞》《甲方乙方》。","avatar":"","photos":[],"added":1731990000000}
+],"directors":["弗兰克·德拉邦特","克里斯托弗·诺兰","姜文","查理·卓别林","是枝裕和"],"countries":["韩国","意大利"],
+"series":[
+{"id":"se1","title":"漫长的季节","year":"2023","releaseDate":"2023-04-22","country":"中国","genre":"剧情/悬疑","status":"已看","totalEp":12,"watchedEp":12,"rating":9.4,"stars":5,"review":"生活流悬疑的典范，东北口音里藏着时代的叹息，结尾一声「往前看，别回头」足够记住很多年。","actors":["a4b"],"synopsis":"出租车司机王响、妹夫龚彪与刑警马德胜，因一桩多年前的碎尸案被重新卷入过去，在秋天里与命运和解。","cover":"","added":1731990000000,"startDate":"2026-09-12","endDate":"2026-09-30"},
+{"id":"se2","title":"琅琊榜","year":"2015","releaseDate":"2015-09-19","country":"中国","genre":"剧情","status":"已看","totalEp":54,"watchedEp":54,"rating":9.1,"stars":5,"actors":[],"synopsis":"麒麟才子梅长苏以病弱之躯搅动京城风云，为赤焰旧案昭雪，权谋与情义交织的古装正剧。","cover":"","added":1731980000000,"startDate":"2026-07-04","endDate":"2026-08-18"},
+{"id":"se3","title":"黑暗荣耀","year":"2022","releaseDate":"2022-12-30","country":"韩国","genre":"剧情/悬疑","status":"在看","totalEp":8,"watchedEp":5,"rating":8.5,"stars":4,"actors":[],"synopsis":"遭受校园暴力的文东恩蛰伏多年，成为加害者孩子的班主任，一步步执行周密的复仇计划。","cover":"","added":1731970000000,"startDate":"2026-11-01"},
+{"id":"se4","title":"请回答1988","year":"2015","releaseDate":"2015-11-06","country":"韩国","genre":"剧情/喜剧/爱情","status":"想看","totalEp":20,"watchedEp":0,"actors":[],"synopsis":"首尔双门洞五户人家的邻里日常，笑泪交织的青春群像，被誉为最温暖的年代剧。","cover":"","added":1731960000000}
+]}</script>
+
+<script>
+"use strict";
+/* ========= 基础工具 ========= */
+const $id = (x)=>document.getElementById(x);
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+let _uid = 0;
+function uid(p){ return p + Date.now().toString(36) + (_uid++).toString(36); }
+function fmtGb(n){ n = Number(n)||0; return n % 1 === 0 ? String(n) : n.toFixed(1); }
+function normName(s){
+  return String(s||"").toLowerCase().replace(/\.[a-z0-9]+$/,"")
+    .replace(/[【】\[\]()（）{}<>《》·._\-\s:：]/g,"").replace(/（|）/g,"");
+}
+function toast(msg, err){
+  const t = $id("toast");
+  t.textContent = msg; t.className = "toast on" + (err ? " err" : "");
+  clearTimeout(t._tm); t._tm = setTimeout(()=>{ t.className = "toast"; }, 3200);
+}
+const PLACEHOLDER = '<div class="noposter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 8h18M7 4v4M11 4v4M15 4v4M19 4v4M7 16v4M17 16v4M3 16h18"></path></svg><div class="ph-t">待添加封面</div></div>';
+
+/* ========= 数据层 ========= */
+const LS_KEY = "wb_filmcase_v1";
+let db = { movies:[], actors:[], series:[], directors:[], countries:[] };
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw !== null){ db = JSON.parse(raw); }
+    else{
+      const baked = JSON.parse($id("lib-data").textContent || "{}");
+      if(baked.movies && baked.movies.length){ db = baked; }
+      else{ db = JSON.parse($id("seed-data").textContent); }
+      saveDB();
+    }
+  }catch(e){ db = { movies:[], actors:[], series:[], directors:[], countries:[] }; }
+  db.movies = db.movies || []; db.actors = db.actors || [];
+  db.series = db.series || []; db.directors = db.directors || []; db.countries = db.countries || [];
+  // 国家主数据统一出口：去空白、去重
+  db.countries = [...new Set(db.countries.map(c=>String(c||"").trim()).filter(Boolean))];
+  // 字段规范统一出口：新旧数据统一补齐默认值，避免散落判断
+  db.movies.forEach(m=>{
+    m.actors = m.actors || [];
+    if(!m.video || !m.video.name) m.video = null;
+    // 状态统一出口：status ∈ 想看/在看/已看/""，旧数据 watched 布尔自动映射
+    if(["想看","在看","已看"].indexOf(m.status) < 0) m.status = m.watched ? "已看" : "";
+    m.watched = m.status === "已看";
+    // 观看日期：仅接受 YYYY-MM-DD，非法值统一清空
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(m.watchDate||""))) m.watchDate = "";
+    m.country = String(m.country||"").trim();
+  });
+  db.series.forEach(s=>{
+    s.actors = s.actors || [];
+    if(["想看","在看","已看"].indexOf(s.status) < 0) s.status = "";
+    s.totalEp = Number(s.totalEp) || 0;
+    s.watchedEp = Number(s.watchedEp) || 0;
+    // 追剧起止时间：仅接受 YYYY-MM-DD
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(s.startDate||""))) s.startDate = "";
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(s.endDate||""))) s.endDate = "";
+    s.country = String(s.country||"").trim();
+  });
+  db.actors.forEach(a=>{
+    a.avatar = a.avatar || "";
+    a.photos = Array.isArray(a.photos) ? a.photos.filter(p=>p && p.id && p.src) : [];
+    a.added = a.added || Date.now();
+  });
+}
+// 会话级视频文件缓存（File 对象无法持久化，仅本次打开期间可直接播放）
+const videoFiles = new Map();
+function saveDB(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(db)); }
+  catch(e){ toast("本机浏览器存储空间不足，数据未能写入；请删减封面图片或尽快导出备份", true); }
+}
+const movieById = (id)=> db.movies.find(m=>m.id===id);
+const actorById = (id)=> db.actors.find(a=>a.id===id);
+function actorFilmCount(id){
+  return db.movies.filter(m=>(m.actors||[]).includes(id)).length
+       + db.series.filter(s=>(s.actors||[]).includes(id)).length;
+}
+
+/* ========= 视图状态 ========= */
+const view = { tab:"movies", status:"全部", genre:"全部", country:"全部", q:"", sort:"added" };
+let formActors = [];      // 影片/剧集表单中已选演员 id
+let pendingCover = "";    // 表单中临时封面
+let pendingVideoMeta = null;   // 影片表单中临时视频元数据
+let pendingVideoFile = null;   // 会话内缓存的视频 File 对象
+let lastBlobUrl = "";
+
+/* ========= 计算层 ========= */
+const STATUS_LIST = ["想看","在看","已看"];
+const PRESET_COUNTRIES = ["中国","日本","韩国","法国","美国","意大利"];
+const STATUS_CLS = {"想看":"st-want","在看":"st-ing","已看":""};
+function statusBadge(s, extra){
+  if(STATUS_LIST.indexOf(s) < 0) return "";
+  return '<span class="seen '+STATUS_CLS[s]+'"'+(extra||"")+'>'+s+'</span>';
+}
+function genresOf(items){
+  const set = new Set();
+  items.forEach(x=>String(x.genre||"").split(/[\/、,，]/).forEach(g=>{ g=g.trim(); if(g) set.add(g); }));
+  return ["全部", ...[...set].sort((a,b)=>a.localeCompare(b,"zh"))];
+}
+function statusCount(list, s){ return list.filter(x=>x.status===s).length; }
+function genreCount(list, g){
+  return list.filter(x=>String(x.genre||"").split(/[\/、,，]/).some(t=>t.trim()===g)).length;
+}
+function matchFilters(x){
+  if(view.status!=="全部" && x.status!==view.status) return false;
+  if(view.genre!=="全部" && !String(x.genre||"").split(/[\/、,，]/).some(g=>g.trim()===view.genre)) return false;
+  if(view.country!=="全部"){
+    const c = String(x.country||"").trim();
+    if(view.country === "未填写"){ if(c) return false; }
+    else if(c !== view.country) return false;
+  }
+  return true;
+}
+function countriesOf(items){
+  const set = new Set();
+  let hasEmpty = false;
+  items.forEach(x=>{
+    const c = String(x.country||"").trim();
+    if(c) set.add(c); else hasEmpty = true;
+  });
+  const out = ["全部", ...[...set].sort((a,b)=>a.localeCompare(b,"zh"))];
+  if(hasEmpty) out.push("未填写");
+  return out;
+}
+function countryCount(list, c){
+  if(c === "未填写") return list.filter(x=>!String(x.country||"").trim()).length;
+  return list.filter(x=>String(x.country||"").trim()===c).length;
+}
+function currentMovies(){
+  const q = view.q.trim().toLowerCase();
+  let list = db.movies.filter(m=>{
+    if(!matchFilters(m)) return false;
+    if(q){
+      const hay = (m.title+" "+(m.country||"")+" "+(m.genre||"")+" "+(m.synopsis||"")+" "+(m.director||"")+" "
+        + (m.actors||[]).map(id=>{const a=actorById(id);return a?a.name:"";}).join(" ")).toLowerCase();
+      if(hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  const s = view.sort;
+  list.sort((a,b)=>{
+    if(s==="name") return String(a.title).localeCompare(String(b.title),"zh");
+    if(s==="gb") return (Number(b.sizeGb)||0)-(Number(a.sizeGb)||0);
+    if(s==="year") return (parseInt(b.year)||0)-(parseInt(a.year)||0);
+    if(s==="rating") return (Number(b.rating)||0)-(Number(a.rating)||0);
+    return (Number(b.added)||0)-(Number(a.added)||0);
+  });
+  return list;
+}
+function currentSeries(){
+  const q = view.q.trim().toLowerCase();
+  let list = db.series.filter(s=>{
+    if(!matchFilters(s)) return false;
+    if(q){
+      const hay = (s.title+" "+(s.country||"")+" "+(s.genre||"")+" "+(s.synopsis||"")+" "+(s.review||"")+" "
+        + (s.actors||[]).map(id=>{const a=actorById(id);return a?a.name:"";}).join(" ")).toLowerCase();
+      if(hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  const s = view.sort;
+  list.sort((a,b)=>{
+    if(s==="name") return String(a.title).localeCompare(String(b.title),"zh");
+    if(s==="gb") return (Number(b.watchedEp)||0)/(Number(b.totalEp)||1)-(Number(a.watchedEp)||0)/(Number(a.totalEp)||1);
+    if(s==="year") return (parseInt(b.year)||0)-(parseInt(a.year)||0);
+    if(s==="rating") return (Number(b.rating)||0)-(Number(a.rating)||0);
+    return (Number(b.added)||0)-(Number(a.added)||0);
+  });
+  return list;
+}
+function currentActors(){
+  const q = view.q.trim().toLowerCase();
+  let list = db.actors.filter(a=>{
+    if(!q) return true;
+    const hay = (a.name+" "+(a.bio||"")+" "+(a.country||"")).toLowerCase();
+    return hay.indexOf(q) >= 0;
+  });
+  list.sort((a,b)=>String(a.name).localeCompare(String(b.name),"zh"));
+  return list;
+}
+
+/* ========= 渲染层（互不调用，统一由 refreshAll 调度） ========= */
+function renderStats(){
+  const total = db.movies.reduce((s,m)=>s+(Number(m.sizeGb)||0),0);
+  $id("ssMovies").textContent = db.movies.length;
+  $id("ssSeries").textContent = db.series.length;
+  $id("ssActors").textContent = db.actors.length;
+  $id("ssGB").textContent = fmtGb(Math.round(total*10)/10) + " GB";
+  $id("nMovies").textContent = " " + db.movies.length;
+  $id("nSeries").textContent = " " + db.series.length;
+  $id("nActors").textContent = " " + db.actors.length;
+}
+const STATUS_DOT = {"想看":"#a78bfa","在看":"#60a5fa","已看":"#e3b171"};
+function chipHtml(cls, attr, val, label, count, dotColor){
+  return '<button type="button" class="chip'+(cls||"")+'" '+attr+'="'+esc(val)+'">'
+    + (dotColor ? '<span class="sdot" style="background:'+dotColor+'"></span>' : '')
+    + esc(label) + '<span class="n">' + count + '</span></button>';
+}
+function renderChips(){
+  const box = $id("chips");
+  if(view.tab === "actors"){ box.hidden = true; return; }
+  box.hidden = false;
+  const list = view.tab === "series" ? db.series : db.movies;
+  // 观看状态组：全部 + 三态
+  $id("statusChips").innerHTML =
+    chipHtml(view.status==="全部"?" is-on":"", "data-status", "全部", "全部", list.length)
+    + STATUS_LIST.map(s=>chipHtml(view.status===s?" is-on":"", "data-status", s, s,
+        statusCount(list, s), STATUS_DOT[s])).join("");
+  // 内容类型组：全部 + 类型并集
+  $id("genreChipsBar").innerHTML = genresOf(list).map(g=>
+    chipHtml(view.genre===g?" is-on":"", "data-genre", g, g, g==="全部"?list.length:genreCount(list, g))
+  ).join("");
+  // 国家/地区组：全部 + 国家并集（无国家的条目归入"未填写"）
+  $id("countryChipsBar").innerHTML = countriesOf(list).map(c=>
+    chipHtml(view.country===c?" is-on":"", "data-country", c, c, c==="全部"?list.length:countryCount(list, c))
+  ).join("");
+  Array.prototype.forEach.call(box.querySelectorAll(".chip"), b=>{
+    b.onclick = ()=>{
+      if(b.hasAttribute("data-status")) view.status = b.getAttribute("data-status");
+      else if(b.hasAttribute("data-genre")) view.genre = b.getAttribute("data-genre");
+      else if(b.hasAttribute("data-country")) view.country = b.getAttribute("data-country");
+      refreshAll();
+    };
+  });
+}
+function starRow(n, extra){
+  const ON = '<svg class="on" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>';
+  const OFF = '<svg class="off" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>';
+  let out = '<span class="starr"'+(extra||"")+'>';
+  for(let i=1;i<=5;i++) out += i<=n ? ON : OFF;
+  return out + '</span>';
+}
+function cardHtml(m){
+  const metaStr = [m.year, m.genre, m.sizeGb?fmtGb(m.sizeGb)+" GB":"", m.rating?"★"+fmtRating(m.rating):""].filter(Boolean).join(" · ");
+  return '<button type="button" class="cell" data-id="'+esc(m.id)+'">'
+    + '<div class="frame">'
+    + (m.cover ? '<img src="'+m.cover+'" alt="'+esc(m.title)+'" loading="lazy">' : PLACEHOLDER)
+    + statusBadge(m.status)
+    + '<div class="cap"><h3>'+esc(m.title)+'</h3><p>'+esc(metaStr)+'</p></div>'
+    + '</div></button>';
+}
+function fmtRating(r){
+  const n = Number(r)||0;
+  return n % 1 === 0 ? String(n) : n.toFixed(1);
+}
+function cardHtmlS(s){
+  const prog = s.totalEp ? (s.watchedEp||0)+"/"+s.totalEp+" 集" : "";
+  const metaStr = [s.year, s.genre, prog, s.rating?"★"+fmtRating(s.rating):""].filter(Boolean).join(" · ");
+  return '<button type="button" class="cell" data-id="'+esc(s.id)+'">'
+    + '<div class="frame">'
+    + (s.cover ? '<img src="'+s.cover+'" alt="'+esc(s.title)+'" loading="lazy">' : PLACEHOLDER)
+    + statusBadge(s.status)
+    + '<div class="cap"><h3>'+esc(s.title)+'</h3><p>'+esc(metaStr)+'</p></div>'
+    + '</div></button>';
+}
+function renderGrid(){
+  const list = currentMovies();
+  $id("grid").innerHTML = list.length
+    ? list.map(cardHtml).join("")
+    : '<div class="empty">还没有影片，点右上角「＋ 影片」开始录入</div>';
+  Array.prototype.forEach.call($id("grid").querySelectorAll(".cell"), b=>{
+    b.onclick = ()=>openMovieDetail(b.getAttribute("data-id"));
+  });
+}
+function renderSeriesGrid(){
+  const list = currentSeries();
+  $id("seriesGrid").innerHTML = list.length
+    ? list.map(cardHtmlS).join("")
+    : '<div class="empty">还没有剧集，点右上角「＋ 剧集」开始收录</div>';
+  Array.prototype.forEach.call($id("seriesGrid").querySelectorAll(".cell"), b=>{
+    b.onclick = ()=>openSeriesDetail(b.getAttribute("data-id"));
+  });
+}
+function renderActors(){
+  const list = currentActors();
+  $id("actorGrid").innerHTML = list.length
+    ? list.map(a=>{
+        const n = actorFilmCount(a.id);
+        return '<button type="button" class="cell" data-id="'+esc(a.id)+'">'
+          + '<div class="acard"><div class="avatar'+(a.gender==="女"?" f":"")+'">'
+          + (a.avatar ? '<img src="'+a.avatar+'" alt="'+esc(a.name)+'" loading="lazy">' : esc(a.name.slice(0,1)))
+          + '</div>'
+          + '<h3>'+esc(a.name)+'</h3><p>参演 '+n+' 部</p></div></button>';
+      }).join("")
+    : '<div class="empty">还没有演员，点右上角「＋ 演员」或在录入影片时添加</div>';
+  Array.prototype.forEach.call($id("actorGrid").querySelectorAll(".cell"), b=>{
+    b.onclick = ()=>openActorDetail(b.getAttribute("data-id"));
+  });
+}
+/* ========= 侧栏观看热力图（近 18 周，日历周格） ========= */
+function watchEvents(){
+  // 汇总三类观看事件：影片看完、剧集开始追、剧集看完
+  const acts = {};
+  const add = (dateStr, kind)=>{
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr||""))) return;
+    const o = acts[dateStr] = acts[dateStr] || { mv:0, st:0, ed:0 };
+    o[kind]++;
+  };
+  db.movies.forEach(m=>{ if(m.watchDate) add(m.watchDate, "mv"); });
+  db.series.forEach(s=>{
+    if(s.startDate) add(s.startDate, "st");
+    if(s.endDate) add(s.endDate, "ed");
+  });
+  return acts;
+}
+function renderHeatmap(){
+  const grid = $id("hgrid"), sum = $id("hsum");
+  if(!grid) return;
+  const WEEKS = 18, PITCH = 11;
+  const acts = watchEvents();
+  const today = new Date(); today.setHours(0,0,0,0);
+  // 周以周日开始；最后一列为今天所在周，向前推 WEEKS-1 列
+  const lastColStart = new Date(today); lastColStart.setDate(lastColStart.getDate() - today.getDay());
+  const firstColStart = new Date(lastColStart); firstColStart.setDate(firstColStart.getDate() - (WEEKS-1)*7);
+  const levelOf = t => t<=0 ? 0 : (t===1 ? 1 : (t===2 ? 2 : (t===3 ? 3 : 4)));
+  const MONTHS = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+  // 月份标签：某列首日所在月份与前列不同时标注
+  let monthHtml = "", lastMonth = -1, lastLabelWeek = -3, totalEvents = 0, activeDays = 0;
+  for(let w=0; w<WEEKS; w++){
+    const d = new Date(firstColStart); d.setDate(d.getDate() + w*7);
+    if(d.getMonth() !== lastMonth && w - lastLabelWeek >= 2){
+      lastMonth = d.getMonth();
+      lastLabelWeek = w;
+      const left = w*PITCH + 2;
+      monthHtml += '<span style="left:'+left+'px">'+MONTHS[lastMonth]+'</span>';
+    }
+  }
+  let colsHtml = "";
+  const dayNames = ["日","一","二","三","四","五","六"];
+  for(let w=0; w<WEEKS; w++){
+    let cells = "";
+    for(let dow=0; dow<7; dow++){
+      const d = new Date(firstColStart); d.setDate(d.getDate() + w*7 + dow);
+      const iso = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+      if(d > today){ cells += '<span class="hcell future"></span>'; continue; }
+      const a = acts[iso];
+      const t = a ? a.mv + a.st + a.ed : 0;
+      totalEvents += t;
+      if(t > 0) activeDays++;
+      const tip = a
+        ? iso.replace(/-/g,"/")+"："
+          + [a.mv?"观看影片 "+a.mv+" 部":"", a.st?"开始追剧 "+a.st+" 部":"", a.ed?"看完剧集 "+a.ed+" 部":""].filter(Boolean).join("，")
+        : iso.replace(/-/g,"/")+"：无记录";
+      cells += '<span class="hcell'+(t?" l"+levelOf(t):"")+(d.getTime()===today.getTime()?" today":"")
+        +'" title="'+esc(tip)+'"></span>';
+    }
+    colsHtml += '<div class="hcol">'+cells+'</div>';
+  }
+  grid.innerHTML =
+    '<div class="hmonths">'+monthHtml+'</div>'
+    + '<div class="hdays">'+[0,2,4,6].map(r=>'<span>'+dayNames[r]+'</span>').join("")+'</div>'
+    + '<div class="hcols">'+colsHtml+'</div>';
+  sum.innerHTML = '近 '+WEEKS+' 周共 <b>'+totalEvents+'</b> 次观看记录，分布在 <b>'+activeDays+'</b> 天';
+}
+function refreshAll(){
+  renderStats();
+  renderChips();
+  renderHeatmap();
+  const isMovies = view.tab === "movies";
+  const isSeries = view.tab === "series";
+  $id("grid").hidden = !isMovies;
+  $id("seriesGrid").hidden = !isSeries;
+  $id("actorGrid").hidden = isMovies || isSeries;
+  $id("btnMatch").hidden = !isMovies;
+  $id("sort").hidden = !isMovies && !isSeries;
+  $id("btnAddMovie").hidden = !isMovies;
+  $id("btnAddSeries").hidden = !isSeries;
+  if(isMovies) renderGrid(); else if(isSeries) renderSeriesGrid(); else renderActors();
+}
+
+/* ========= 弹窗 ========= */
+function openSheet(html, slim){
+  const s = $id("sheet");
+  s.className = "sheet" + (slim ? " slim" : "");
+  s.innerHTML = '<button class="x" id="sheetX" type="button">✕</button>' + html;
+  $id("mask").classList.add("on");
+  $id("sheetX").onclick = closeSheet;
+}
+function closeSheet(){
+  stopBlobPlay();
+  if($id("lightbox")) closeLightbox();
+  $id("mask").classList.remove("on");
+  $id("sheet").innerHTML = "";
+}
+$id("mask").onclick = function(e){ if(e.target === $id("mask")) closeSheet(); };
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeSheet(); });
+
+/* ========= 影片详情 ========= */
+function openMovieDetail(id){
+  const m = movieById(id); if(!m) return;
+  const stars = (m.actors||[]).map(aid=>actorById(aid)).filter(Boolean);
+  const pathRow = m.path
+    ? '<div class="v">'+esc(m.path)+'<button class="copy" data-copy="'+esc(m.path)+'" type="button">复制路径</button></div>'
+    : '<div class="v">（未填写）</div>';
+  openSheet(
+    '<div class="detail">'
+    + '<div class="visual" id="dVisual">'+(m.cover?'<img src="'+m.cover+'" alt="'+esc(m.title)+'">':PLACEHOLDER)+'</div>'
+    + '<div class="info">'
+    +   '<h2>'+esc(m.title)+statusBadge(m.status,' style="position:static;display:inline-block;margin-left:8px"')+'</h2>'
+    +   '<div class="meta">'+[fmtDateDisp(m.releaseDate)||(m.year?m.year+"年":"年份未知"), m.country||"", m.genre||"类型未填"].filter(Boolean).join(" · ")+'</div>'
+    +   (m.rating||m.stars
+        ? '<div style="margin:8px 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+          + (m.stars ? starRow(m.stars) : '')
+          + (m.rating ? '<span style="color:var(--gold2);font-weight:600">★ '+fmtRating(m.rating)+'</span><span style="color:var(--dim2);font-size:11.5px">（6-10 分制）</span>' : '')
+          + '</div>' : '')
+    +   '<p class="note">'+(esc(m.synopsis)||"（暂无简介）")+'</p>'
+    +   (m.review ? '<div class="secttl">我的评价</div><div class="reviewbox">'+esc(m.review)+'</div>' : '')
+    +   '<div class="kv">'
+    +     '<div class="k">导演</div><div class="v">'+(esc(m.director)||"（未填写）")+'</div>'
+    +     '<div class="k">国家 / 地区</div><div class="v">'+(esc(m.country)||"（未填写）")+'</div>'
+    +     '<div class="k">发行日期</div><div class="v">'+(fmtDateDisp(m.releaseDate)||(m.year?m.year+"年":"（未填写）"))+'</div>'
+    +     '<div class="k">本地路径</div>'+pathRow
+    +     '<div class="k">容量</div><div class="v">'+(m.sizeGb?fmtGb(m.sizeGb)+" GB":"未填写")+'</div>'
+    +     '<div class="k">视频文件</div><div class="v">'+(m.video
+            ? esc(m.video.name)+'（'+fmtBytes(m.video.size)+' · '+esc(String(m.video.ext).toUpperCase())+'）'
+              + '<button class="copy" id="btnPlayV" type="button">▶ 页内播放</button>'
+            : '未关联')+'</div>'
+    +     '<div class="k">观看日期</div><div class="v">'+(m.watchDate||"（未填写）")+'</div>'
+    +     '<div class="k">录入时间</div><div class="v">'+(m.added?new Date(m.added).toLocaleDateString("zh-CN"):"—")+'</div>'
+    +   '</div>'
+    +   '<div class="secttl">关联演员</div>'
+    +   '<div class="starchips">'+(stars.length
+          ? stars.map(a=>'<button type="button" class="starchip" data-actor="'+esc(a.id)+'">'+esc(a.name)+'</button>').join("")
+          : '<span style="color:var(--dim2);font-size:12.5px">尚未关联演员</span>')+'</div>'
+    +   '<div class="acts" style="margin-top:18px">'
+    +     '<button class="btn'+(m.status==="已看"?"":" watched-cta")+'" id="dWatch" type="button">'
+    +       (m.status==="已看" ? "✓ 已看 · 点击取消标记" : "标记为已看")+'</button>'
+    +     '<button class="btn primary" id="dEdit" type="button">编辑</button>'
+    +     '<button class="btn danger" id="dDel" type="button">删除影片</button>'
+    +   '</div>'
+    + '</div></div>'
+  );
+  Array.prototype.forEach.call($id("sheet").querySelectorAll(".starchip"), b=>{
+    b.onclick = ()=>openActorDetail(b.getAttribute("data-actor"));
+  });
+  const cp = $id("sheet").querySelector(".copy[data-copy]");
+  if(cp) cp.onclick = ()=>{
+    (navigator.clipboard ? navigator.clipboard.writeText(cp.getAttribute("data-copy")) : Promise.reject())
+      .then(()=>toast("路径已复制")).catch(()=>toast("复制失败，请手动选择复制", true));
+  };
+  const pv = $id("btnPlayV");
+  if(pv) pv.onclick = ()=>playMovieVideo(m);
+  $id("dWatch").onclick = ()=>{
+    m.status = m.status==="已看" ? "" : "已看";
+    m.watched = m.status==="已看";
+    // 标记为已看时若无观看日期，自动补记当天，保证热力图完整
+    if(m.status==="已看" && !m.watchDate) m.watchDate = todayStr();
+    saveDB(); refreshAll(); openMovieDetail(m.id);
+    toast(m.status==="已看" ? "已标记为已看" : "已取消已看标记");
+  };
+  $id("dEdit").onclick = ()=>openMovieForm(m);
+  $id("dDel").onclick = ()=>{
+    if(!confirm("确定删除影片《"+m.title+"》吗？此操作不可恢复。")) return;
+    db.movies = db.movies.filter(x=>x.id!==m.id);
+    saveDB(); closeSheet(); refreshAll(); toast("已删除影片");
+  };
+}
+
+/* ========= 演员资料派生信息（集中出口） ========= */
+const ZODIAC = [["摩羯",120],["水瓶",219],["双鱼",321],["白羊",420],["金牛",521],["双子",622],
+  ["巨蟹",723],["狮子",823],["处女",923],["天秤",1024],["天蝎",1123],["射手",1222],["摩羯",1232]];
+const CYCLE = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
+function zodiacOf(birth){
+  const d = String(birth||"").split("-");
+  if(d.length < 2 || !/^\d{4}$/.test(d[0]) || !(+d[1] >= 1 && +d[1] <= 12)) return "";
+  const mth = +d[1], day = +d[2]||1, v = mth*100+day;
+  for(const [z,edge] of ZODIAC){ if(v < edge) return z+"座"; }
+  return "摩羯座";
+}
+function cycleOf(birth){
+  const y = parseInt(String(birth||"").split("-")[0]);
+  return y ? CYCLE[(y-4)%12] : "";
+}
+function ageOf(birth){
+  const d = String(birth||"");
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return "";
+  const b = new Date(d), now = new Date();
+  if(isNaN(b.getTime())) return "";
+  let age = now.getFullYear()-b.getFullYear();
+  if(now < new Date(now.getFullYear(), b.getMonth(), b.getDate())) age--;
+  return age >= 0 && age < 200 ? age+"岁" : "";
+}
+function fmtBytes(n){
+  if(!n) return "0 GB";
+  const gb = n/1073741824;
+  if(gb >= 1) return (Math.round(gb*100)/100)+" GB";
+  const mb = n/1048576;
+  return mb >= 1 ? (Math.round(mb*10)/10)+" MB" : Math.max(1,Math.round(n/1024))+" KB";
+}
+
+/* ========= 演员详情 ========= */
+function openActorDetail(id){
+  const a = actorById(id); if(!a) return;
+  const films = db.movies.filter(m=>(m.actors||[]).includes(a.id));
+  const seriesList = db.series.filter(s=>(s.actors||[]).includes(a.id));
+  const works = films.map(m=>({kind:"movie", it:m})).concat(seriesList.map(s=>({kind:"series", it:s})));
+  const kv = (k,v)=>'<div class="k">'+k+'</div><div class="v">'+(v||"未填写")+'</div>';
+  const metaBits = [a.gender, ageOf(a.birth), a.country].filter(Boolean).join(" · ");
+  const ageBits = [zodiacOf(a.birth), cycleOf(a.birth)].filter(Boolean).join(" · ");
+  openSheet(
+    '<div class="detail">'
+    + '<div class="visual" style="background:linear-gradient(180deg,#181c22,#0e1013);flex-direction:column;gap:12px;padding:20px 14px">'
+    +   '<div class="bigavatar">'+(a.avatar?'<img src="'+a.avatar+'" alt="'+esc(a.name)+'">'
+        : '<div class="ph">'+esc(a.name.slice(0,1))+'</div>')+'</div>'
+    +   '<div style="text-align:center">'
+    +     '<div style="font-size:19px;font-weight:600;letter-spacing:.04em">'+esc(a.name)+'</div>'
+    +     (a.enName?'<div style="color:var(--dim);font-size:12px;margin-top:3px;letter-spacing:.03em">'+esc(a.enName)+'</div>':'')
+    +     '<div style="color:var(--dim);font-size:12.5px;margin-top:6px">'+esc(metaBits)+'</div>'
+    +     '<div style="color:var(--dim2);font-size:11px;margin-top:4px">加入时间 '+new Date(a.added||Date.now()).toLocaleDateString("zh-CN")+'</div>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="info">'
+    +   '<div class="kvgrid"><div class="kv">'
+    +     kv("生日", a.birth ? a.birth+(ageOf(a.birth)?"（"+ageOf(a.birth)+"）":"") : "")
+    +     kv("星座", ageBits ? zodiacOf(a.birth) : "")
+    +     kv("生肖", cycleOf(a.birth))
+    +     kv("血型", a.blood)
+    +     kv("出生地", a.birthplace)
+    +   '</div><div class="kv">'
+    +     kv("性别", a.gender)
+    +     kv("国籍", a.country)
+    +     kv("职业", a.job)
+    +     kv("所属机构", a.agency)
+    +     kv("出道时间", a.debut ? a.debut+(String(a.debut).match(/^\d{4}$/)?"年":"") : "")
+    +   '</div></div>'
+    +   (a.alias?'<div class="kv" style="margin-bottom:14px">'+kv("别名", a.alias)+'</div>':'')
+    +   '<p class="note">'+(esc(a.bio)||"（暂无简介）")+'</p>'
+    +   '<div class="secttl">照片（'+a.photos.length+' 张）</div>'
+    +   '<div class="photo-grid">'+(a.photos.length
+          ? a.photos.map((p,i)=>'<div class="photo-item">'
+              + (p.src===a.avatar?'<span class="covmark">封面</span>':'')
+              + '<img src="'+p.src+'" alt="" data-lb="'+i+'" loading="lazy">'
+              + '<div class="pacts">'
+              +   '<button class="pbtn" type="button" data-setcov="'+i+'">'+(p.src===a.avatar?'更换封面':'设为封面')+'</button>'
+              +   '<button class="pbtn" type="button" data-mvup="'+i+'">←</button>'
+              +   '<button class="pbtn" type="button" data-mvdn="'+i+'">→</button>'
+              +   '<button class="pbtn del" type="button" data-delp="'+i+'">删</button>'
+              + '</div></div>').join("")
+          : '<span style="color:var(--dim2);font-size:12.5px">暂无照片，点下方「管理照片」上传</span>')+'</div>'
+    +   '<div class="acts" style="margin-top:14px">'
+    +     '<button class="btn primary" id="btnPhotoMgr" type="button">管理照片</button>'
+    +     '<button class="btn" id="btnUpAvatar" type="button">上传 / 更换封面照片</button>'
+    +   '</div>'
+    +   '<div class="secttl">参演作品（影片 '+films.length+' · 剧集 '+seriesList.length+'）</div>'
+    +   '<div class="minifilms">'+(works.length
+          ? works.map(w=>'<button type="button" class="minifilm" data-kind="'+w.kind+'" data-movie="'+esc(w.it.id)+'">'
+              + '<div class="mf">'+(w.it.cover?'<img src="'+w.it.cover+'" alt="">':PLACEHOLDER)+'</div><span>'+esc(w.it.title)+(w.kind==="series"?"（剧）":"")+'</span></button>').join("")
+          : '<span style="color:var(--dim2);font-size:12.5px">尚未关联作品</span>')+'</div>'
+    +   '<div class="acts" style="margin-top:16px">'
+    +     '<button class="btn primary" id="aEdit" type="button">编辑资料</button>'
+    +     '<button class="btn danger" id="aDel" type="button">删除演员</button>'
+    +   '</div>'
+    + '</div></div>', false
+  );
+  // 照片区交互
+  const sheet = $id("sheet");
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-lb]"), b=>{
+    b.onclick = ()=>openLightbox(a, +b.getAttribute("data-lb"));
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-setcov]"), b=>{
+    b.onclick = ()=>{ a.avatar = a.photos[+b.getAttribute("data-setcov")].src;
+      saveDB(); openActorDetail(a.id); toast("已设置封面照片"); };
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-mvup]"), b=>{
+    b.onclick = ()=>movePhoto(a, +b.getAttribute("data-mvup"), -1);
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-mvdn]"), b=>{
+    b.onclick = ()=>movePhoto(a, +b.getAttribute("data-mvdn"), 1);
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-delp]"), b=>{
+    b.onclick = ()=>{
+      const i = +b.getAttribute("data-delp");
+      if(!confirm("确定删除这张照片吗？")) return;
+      const rm = a.photos.splice(i,1)[0];
+      if(rm && rm.src===a.avatar) a.avatar = a.photos.length ? a.photos[0].src : "";
+      saveDB(); openActorDetail(a.id); toast("照片已删除");
+    };
+  });
+  $id("btnPhotoMgr").onclick = ()=>openPhotoManager(a);
+  $id("btnUpAvatar").onclick = ()=>{ $id("avatarPick").setAttribute("data-target", a.id); $id("avatarPick").click(); };
+  Array.prototype.forEach.call(sheet.querySelectorAll(".minifilm"), b=>{
+    b.onclick = ()=> b.getAttribute("data-kind")==="series"
+      ? openSeriesDetail(b.getAttribute("data-movie"))
+      : openMovieDetail(b.getAttribute("data-movie"));
+  });
+  $id("aEdit").onclick = ()=>openActorForm(a);
+  $id("aDel").onclick = ()=>{
+    if(!confirm("确定删除演员「"+a.name+"」吗？其在影片与剧集中的关联将一并移除。")) return;
+    db.actors = db.actors.filter(x=>x.id!==a.id);
+    db.movies.forEach(m=>{ m.actors = (m.actors||[]).filter(x=>x!==a.id); });
+    db.series.forEach(s=>{ s.actors = (s.actors||[]).filter(x=>x!==a.id); });
+    saveDB(); closeSheet(); refreshAll(); toast("已删除演员");
+  };
+}
+function movePhoto(a, i, dir){
+  const j = i + dir;
+  if(j < 0 || j >= a.photos.length) return;
+  const t = a.photos[i]; a.photos[i] = a.photos[j]; a.photos[j] = t;
+  saveDB(); openActorDetail(a.id);
+}
+
+/* ========= 影片表单 ========= */
+function openMovieForm(m){
+  const isEdit = !!m;
+  formActors = isEdit ? (m.actors||[]).slice() : [];
+  gState.f = { sel: isEdit ? String(m.genre||"").split(/[\/、,，]/).map(s=>s.trim()).filter(Boolean) : [], extra: [] };
+  pendingCover = isEdit ? (m.cover||"") : "";
+  pendingVideoMeta = isEdit && m.video ? Object.assign({}, m.video) : null;
+  pendingVideoFile = isEdit && videoFiles.get(m.id) || null;
+  const st0 = isEdit ? (m.status||"") : "";
+  const dirOpts = db.directors.slice().sort((a,b)=>a.localeCompare(b,"zh"));
+  openSheet(
+    '<div class="form"><h2>'+(isEdit?"编辑影片":"录入影片")+'</h2>'
+    + '<div class="fld"><label>片名 *</label><input type="text" id="fTitle" value="'+esc(isEdit?m.title:"")+'" placeholder="影片名称"></div>'
+    + '<div class="fld"><label>导演</label><input type="text" id="fDirector" list="directorList" value="'+esc(isEdit?m.director||"":"")+'" placeholder="从下拉选择已有导演，或输入新导演">'
+    +   '<datalist id="directorList">'+dirOpts.map(d=>'<option value="'+esc(d)+'">').join("")+'</datalist></div>'
+    + '<div class="fld"><label>发行日期</label><div class="daterow" id="fDateRow"></div>'
+    +   '<div style="color:var(--dim2);font-size:11.5px;margin-top:5px">可只选年份，月、日留“—”</div></div>'
+    + '<div class="fld"><label>类型（可多选）</label><div class="gchips" id="fGenreChips"></div>'
+    +   '<div class="gnewrow" id="fGNewRow" hidden><input type="text" id="fGNewName" placeholder="输入新类型名称">'
+    +   '<button class="btn" id="fGNewOk" type="button">添加</button></div></div>'
+    + '<div class="fld"><label>国家 / 地区</label><select id="fCountry"></select>'
+    +   '<div class="gnewrow" id="fCNewRow" hidden><input type="text" id="fCNewName" placeholder="输入新国家 / 地区名称">'
+    +   '<button class="btn" id="fCNewOk" type="button">添加</button></div></div>'
+    + '<div class="fld"><label>容量（GB）</label><input type="number" id="fSize" step="0.1" min="0" value="'+esc(isEdit&&m.sizeGb?m.sizeGb:"")+'" placeholder="如 2.4"></div>'
+    + '<div class="fld"><label>状态</label><div class="gchips" id="fStatusChips"></div></div>'
+    + '<div class="fld"><label>观看日期（选填）</label><input type="date" id="fWatchDate" value="'+esc(isEdit?m.watchDate||"":"")+'">'
+    +   '<div style="color:var(--dim2);font-size:11.5px;margin-top:5px">看完这部影片的日期，将计入侧栏「观看热力」</div></div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>评分（6-10，选填）</label><input type="number" id="fRating" step="0.1" min="6" max="10" value="'+esc(isEdit&&m.rating?fmtRating(m.rating):"")+'" placeholder="如 8.5"></div>'
+    +   '<div class="fld"><label>评级（1-5 星）</label><select id="fStars">'
+    +     [[0,"未评级"],["1","★ 1 星"],["2","★★ 2 星"],["3","★★★ 3 星"],["4","★★★★ 4 星"],["5","★★★★★ 5 星"]].map(p=>'<option value="'+p[0]+'"'+(isEdit&&(m.stars||0)==p[0]?" selected":"")+'>'+p[1]+'</option>').join("")
+    +   '</select></div>'
+    + '</div>'
+    + '<div class="fld"><label>评价</label><textarea id="fReview" placeholder="看完的感受、推荐语…（选填）">'+esc(isEdit?m.review||"":"")+'</textarea></div>'
+    + '<div class="fld"><label>简介</label><textarea id="fSynopsis" placeholder="剧情简介、看点备注…">'+esc(isEdit?m.synopsis||"":"")+'</textarea></div>'
+    + '<div class="fld"><label>封面</label><div class="coverbox">'
+    +   '<div class="cthumb" id="fThumb">'+(pendingCover?'<img src="'+pendingCover+'" alt="">':'暂无')+'</div>'
+    +   '<div class="coverbtns">'
+    +     '<button class="btn" id="fPickCover" type="button">选择封面图片</button>'
+    +     '<button class="btn ghost" id="fClearCover" type="button">清除封面</button>'
+    +   '</div></div></div>'
+    + '<div class="fld"><label>视频文件（本地磁盘，可关联回影片记录）</label><div id="vfileBox"></div>'
+    +   '<button class="btn" id="fPickVideo" type="button" style="margin-top:8px">从本地磁盘选择视频文件</button></div>'
+    + '<div class="fld"><label>关联演员</label><div class="actorpick">'
+    +   '<div class="picked" id="pickedActors"></div>'
+    +   '<div class="pickrow">'
+    +     '<select id="actorSel"><option value="">选择已有演员…</option></select>'
+    +     '<input type="text" id="newActorName" placeholder="或输入新演员姓名">'
+    +     '<button class="btn" id="btnNewActor" type="button">新增</button>'
+    +   '</div></div></div>'
+    + '<div class="facts">'
+    +   '<button class="btn ghost" id="fCancel" type="button">取消</button>'
+    +   '<button class="btn primary" id="fSave" type="button">'+(isEdit?"保存修改":"保存影片")+'</button>'
+    + '</div></div>', true
+  );
+  renderPicked();
+  initDateSel("f", isEdit ? m : null);
+  initCountrySel("f", isEdit ? m.country : "");
+  renderGenreChips("f");
+  renderStatusChips("f", st0);
+  $id("fGNewOk").onclick = ()=>addCustomGenre("f");
+  $id("fGNewName").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); addCustomGenre("f"); } });
+  $id("fPickCover").onclick = ()=>$id("posterSingle").click();
+  $id("fClearCover").onclick = ()=>{ pendingCover = ""; $id("fThumb").innerHTML = "暂无"; };
+  $id("fPickVideo").onclick = ()=>{ $id("videoPick").removeAttribute("data-target"); $id("videoPick").click(); };
+  renderVfile();
+  $id("actorSel").onchange = function(){
+    if(!this.value) return;
+    if(!formActors.includes(this.value)) formActors.push(this.value);
+    this.value = ""; renderPicked();
+  };
+  $id("btnNewActor").onclick = addNewActor;
+  $id("newActorName").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); addNewActor(); } });
+  $id("fCancel").onclick = closeSheet;
+  $id("fSave").setAttribute("data-edit", isEdit ? m.id : "");
+  $id("fSave").onclick = submitMovie;
+}
+function renderPicked(){
+  $id("pickedActors").innerHTML = formActors.map(id=>{
+    const a = actorById(id); if(!a) return "";
+    return '<span class="pk">'+esc(a.name)+'<i data-rm="'+esc(id)+'">✕</i></span>';
+  }).join("");
+  Array.prototype.forEach.call($id("pickedActors").querySelectorAll("i"), b=>{
+    b.onclick = ()=>{ formActors = formActors.filter(x=>x!==b.getAttribute("data-rm")); renderPicked(); };
+  });
+  const sel = $id("actorSel");
+  sel.innerHTML = '<option value="">选择已有演员…</option>' + db.actors
+    .filter(a=>!formActors.includes(a.id))
+    .sort((x,y)=>x.name.localeCompare(y.name,"zh"))
+    .map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+'</option>').join("");
+}
+function addNewActor(){
+  const inp = $id("newActorName");
+  const name = inp.value.trim();
+  if(!name){ toast("请输入演员姓名", true); return; }
+  let a = db.actors.find(x=>x.name===name);
+  if(!a){
+    a = { id:uid("a"), name:name, gender:"", birth:"", country:"", bio:"" };
+    db.actors.push(a);
+  }
+  if(!formActors.includes(a.id)) formActors.push(a.id);
+  inp.value = ""; renderPicked();
+}
+/* ========= 表单通用控件：发行日期 / 类型多选 / 状态（影片 f 前缀、剧集 s 前缀复用） ========= */
+const BASE_GENRES = ["剧情","动作","爱情","科幻","喜剧"];
+function knownGenres(){
+  const set = new Set(BASE_GENRES);
+  db.movies.forEach(m=>String(m.genre||"").split(/[\/、,，]/).forEach(g=>{ g=g.trim(); if(g) set.add(g); }));
+  db.series.forEach(s=>String(s.genre||"").split(/[\/、,，]/).forEach(g=>{ g=g.trim(); if(g) set.add(g); }));
+  return [...set];
+}
+const gState = {}; // 前缀 -> { sel:[], extra:[] }
+/* 国家下拉：预置 + 主数据 + 影片/剧集已用国家，统一去重排序 */
+function knownCountries(){
+  const set = new Set(PRESET_COUNTRIES);
+  db.countries.forEach(c=>{ c = String(c||"").trim(); if(c) set.add(c); });
+  db.movies.forEach(m=>{ const c = String(m.country||"").trim(); if(c) set.add(c); });
+  db.series.forEach(s=>{ const c = String(s.country||"").trim(); if(c) set.add(c); });
+  return [...set].sort((a,b)=>a.localeCompare(b,"zh"));
+}
+function initCountrySel(p, initial){
+  const sel = $id(p+"Country"); if(!sel) return;
+  initial = String(initial||"").trim();
+  const row = $id(p+"CNewRow"), inp = $id(p+"CNewName");
+  const rebuild = (selected)=>{
+    const cs = knownCountries();
+    if(selected && cs.indexOf(selected) < 0) cs.push(selected); // 编辑旧数据兜底：选中值即使不在列表也补一项
+    sel.innerHTML = '<option value=""'+(selected===""?" selected":"")+'>未填写</option>'
+      + cs.map(c=>'<option value="'+esc(c)+'"'+(c===selected?" selected":"")+'>'+esc(c)+'</option>').join("")
+      + '<option value="__new__">＋ 新增国家…</option>';
+  };
+  rebuild(initial);
+  sel.onchange = function(){
+    if(this.value === "__new__"){ row.hidden = false; inp.focus(); }
+    else row.hidden = true;
+  };
+  const confirmNew = ()=>{
+    const v = inp.value.trim();
+    if(!v){ toast("请输入国家名称", true); return; }
+    if(db.countries.indexOf(v) < 0){ db.countries.push(v); toast("已保存新国家「"+v+"」"); }
+    inp.value = ""; row.hidden = true;
+    rebuild(v); // 与已有国家重名时自动选中已有项
+  };
+  $id(p+"CNewOk").onclick = confirmNew;
+  inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); confirmNew(); } });
+}
+function readCountrySel(p, fallback){
+  const sel = $id(p+"Country");
+  if(!sel) return String(fallback||"").trim();
+  const v = sel.value;
+  // 停留在"新增"输入行未确认时，回退到原值，避免静默清空
+  return v === "__new__" ? String(fallback||"").trim() : v;
+}
+function daysInMonth(y,mth){ return new Date(y, mth, 0).getDate(); }
+function parseDateParts(obj){
+  let y="",mth="",d="";
+  const rd = String((obj && obj.releaseDate)||"");
+  if(/^\d{4}-\d{2}-\d{2}/.test(rd)){ y=rd.slice(0,4); mth=String(+rd.slice(5,7)); d=String(+rd.slice(8,10)); }
+  else if(/^\d{4}-\d{2}/.test(rd)){ y=rd.slice(0,4); mth=String(+rd.slice(5,7)); }
+  else if(/^\d{4}/.test(rd)){ y=rd.slice(0,4); }
+  else if(/^\d{4}$/.test(String((obj && obj.year)||""))){ y=obj.year; }
+  return {y:y, mth:mth, d:d};
+}
+function initDateSel(p, obj){
+  const row = $id(p+"DateRow"); if(!row) return;
+  const cur = new Date().getFullYear();
+  const pt = parseDateParts(obj);
+  row.innerHTML =
+    '<select id="'+p+'Dy"><option value="">— 年 —</option>'
+    + Array.from({length:cur+1-1900},(_,i)=>String(cur-i)).map(v=>'<option value="'+v+'"'+(v===pt.y?" selected":"")+'>'+v+'</option>').join("")
+    + '</select>'
+    + '<select id="'+p+'Dm"><option value="">— 月 —</option>'
+    + Array.from({length:12},(_,i)=>String(i+1)).map(v=>'<option value="'+v+'"'+(v===pt.mth?" selected":"")+'>'+v+' 月</option>').join("")
+    + '</select>'
+    + '<select id="'+p+'Dd"></select>';
+  renderDayOpts(p, pt.d);
+  $id(p+"Dy").onchange = ()=>renderDayOpts(p);
+  $id(p+"Dm").onchange = ()=>renderDayOpts(p);
+}
+function renderDayOpts(p, sel){
+  const dd = $id(p+"Dd"); if(!dd) return;
+  const mthVal = $id(p+"Dm").value;
+  // 初始化时回显已保存的"日"；变更年月时保留当前选择（新月不含该日则自然清空）
+  const prev = (sel !== undefined) ? sel : dd.value;
+  const n = mthVal ? daysInMonth(+$id(p+"Dy").value||2000, +mthVal) : 31;
+  // 未选月份前禁用"日"，避免出现"选了日却存不进去"的静默丢值
+  dd.disabled = !mthVal;
+  dd.innerHTML = '<option value="">— 日 —</option>'
+    + Array.from({length:n},(_,i)=>String(i+1)).map(v=>'<option value="'+v+'"'+(v===prev?" selected":"")+'>'+v+' 日</option>').join("");
+}
+function readDateSel(p){
+  const y=$id(p+"Dy").value, mth=$id(p+"Dm").value, d=$id(p+"Dd").value;
+  if(!y) return "";
+  if(!mth) return y;
+  if(!d) return y+"-"+String(+mth).padStart(2,"0");
+  return y+"-"+String(+mth).padStart(2,"0")+"-"+String(+d).padStart(2,"0");
+}
+function renderGenreChips(p){
+  const box = $id(p+"GenreChips"); if(!box) return;
+  const st = gState[p];
+  box.innerHTML = knownGenres().map(g=>
+      '<button type="button" class="gchip'+(st.sel.indexOf(g)>=0?" is-on":"")+'" data-g="'+esc(g)+'">'+esc(g)+'</button>').join("")
+    + '<button type="button" class="gchip" data-gnew="1">＋ 新增</button>';
+  Array.prototype.forEach.call(box.querySelectorAll(".gchip[data-g]"), b=>{
+    b.onclick = ()=>{
+      const g = b.getAttribute("data-g");
+      const i = st.sel.indexOf(g);
+      if(i>=0) st.sel.splice(i,1); else st.sel.push(g);
+      renderGenreChips(p);
+    };
+  });
+  box.querySelector("[data-gnew]").onclick = ()=>{
+    const r = $id(p+"GNewRow");
+    r.hidden = !r.hidden;
+    if(!r.hidden) $id(p+"GNewName").focus();
+  };
+}
+function addCustomGenre(p){
+  const inp = $id(p+"GNewName");
+  const g = inp.value.trim();
+  if(!g){ toast("请输入类型名称", true); return; }
+  const st = gState[p];
+  if(st.sel.indexOf(g)<0) st.sel.push(g);
+  if(st.extra.indexOf(g)<0) st.extra.push(g);
+  inp.value=""; $id(p+"GNewRow").hidden = true;
+  renderGenreChips(p);
+  toast("已添加类型「"+g+"」");
+}
+function renderStatusChips(p, status){
+  const box = $id(p+"StatusChips"); if(!box) return;
+  box.innerHTML = STATUS_LIST.map(s=>
+    '<button type="button" class="gchip'+(status===s?" is-on":"")+'" data-s="'+s+'">'+s+'</button>').join("")
+    + '<span style="color:var(--dim2);font-size:11.5px;align-self:center;margin-left:4px">再次点击可取消</span>';
+  Array.prototype.forEach.call(box.querySelectorAll(".gchip[data-s]"), b=>{
+    b.onclick = ()=>{
+      const s = b.getAttribute("data-s");
+      renderStatusChips(p, status===s ? "" : s);
+    };
+  });
+}
+function readStatusChips(p){
+  const on = $id(p+"StatusChips").querySelector(".gchip.is-on");
+  return on ? on.getAttribute("data-s") : "";
+}
+function genreStrOf(p){ return gState[p].sel.join("/"); }
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function validDateOrEmpty(v){
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(v||"")) ? v : "";
+}
+// 日期回显格式化：1994 → 1994年；2010-09 → 2010年9月；2010-09-01 → 2010年9月1日
+function fmtDateDisp(v){
+  const s = String(v||"");
+  let t;
+  if((t = s.match(/^(\d{4})-(\d{2})-(\d{2})$/))) return (+t[1])+"年"+(+t[2])+"月"+(+t[3])+"日";
+  if((t = s.match(/^(\d{4})-(\d{2})$/))) return (+t[1])+"年"+(+t[2])+"月";
+  if(/^\d{4}$/.test(s)) return s+"年";
+  return s;
+}
+function submitMovie(){
+  const title = $id("fTitle").value.trim();
+  if(!title){ toast("片名为必填项", true); return; }
+  const ratingRaw = $id("fRating").value.trim();
+  if(ratingRaw !== ""){
+    const r = Number(ratingRaw);
+    if(isNaN(r) || r < 6 || r > 10){ toast("评分需在 6-10 之间，或不填", true); return; }
+  }
+  const watchDate = validDateOrEmpty($id("fWatchDate").value);
+  if(watchDate && watchDate > todayStr()){ toast("观看日期不能晚于今天", true); return; }
+  // 发行日期完整性：只选了月/日而没选年时，保存会静默丢值，必须提示
+  if(!$id("fDy").value && ($id("fDm").value || $id("fDd").value)){
+    toast("发行日期不完整：请补选年份（月、日可留空）", true); return;
+  }
+  const editId = $id("fSave").getAttribute("data-edit") || "";
+  const isNew = !editId;
+  const m = movieById(editId) || { id:uid("m"), added:Date.now(), watched:false, cover:"", actors:[] };
+  m.title = title;
+  m.director = $id("fDirector").value.trim();
+  // 导演记忆：新导演自动入主数据，后续可重复选择
+  if(m.director && db.directors.indexOf(m.director) < 0){ db.directors.push(m.director); toast("已保存新导演「"+m.director+"」"); }
+  m.releaseDate = readDateSel("f");
+  m.year = m.releaseDate ? m.releaseDate.slice(0,4) : (isNew ? "" : (m.year||""));
+  m.genre = genreStrOf("f");
+  m.country = readCountrySel("f", m.country);
+  m.sizeGb = Number($id("fSize").value) || 0;
+  m.status = readStatusChips("f");
+  m.watched = m.status === "已看";
+  m.watchDate = watchDate;
+  m.rating = ratingRaw === "" ? 0 : Number(ratingRaw);
+  m.stars = Number($id("fStars").value) || 0;
+  m.review = $id("fReview").value.trim();
+  m.synopsis = $id("fSynopsis").value.trim();
+  m.cover = pendingCover;
+  m.actors = formActors.slice();
+  m.video = pendingVideoMeta;
+  if(pendingVideoFile) videoFiles.set(m.id, pendingVideoFile);
+  if(isNew) db.movies.unshift(m);
+  saveDB(); closeSheet(); refreshAll();
+  toast(isNew ? "影片《"+title+"》已录入" : "影片已更新");
+}
+
+/* ========= 剧集表单与详情（复用影片的日期/类型/状态控件与演员选择器） ========= */
+function seriesById(id){ return db.series.find(s=>s.id===id); }
+function openSeriesForm(s){
+  const isEdit = !!s;
+  formActors = isEdit ? (s.actors||[]).slice() : [];
+  gState.s = { sel: isEdit ? String(s.genre||"").split(/[\/、,，]/).map(x=>x.trim()).filter(Boolean) : [], extra: [] };
+  pendingCover = isEdit ? (s.cover||"") : "";
+  const st0 = isEdit ? (s.status||"") : "";
+  openSheet(
+    '<div class="form"><h2>'+(isEdit?"编辑剧集":"录入剧集")+'</h2>'
+    + '<div class="fld"><label>剧名 *</label><input type="text" id="sTitle" value="'+esc(isEdit?s.title:"")+'" placeholder="剧集名称"></div>'
+    + '<div class="fld"><label>发行日期</label><div class="daterow" id="sDateRow"></div>'
+    +   '<div style="color:var(--dim2);font-size:11.5px;margin-top:5px">可只选年份，月、日留“—”</div></div>'
+    + '<div class="fld"><label>类型（可多选）</label><div class="gchips" id="sGenreChips"></div>'
+    +   '<div class="gnewrow" id="sGNewRow" hidden><input type="text" id="sGNewName" placeholder="输入新类型名称">'
+    +   '<button class="btn" id="sGNewOk" type="button">添加</button></div></div>'
+    + '<div class="fld"><label>国家 / 地区</label><select id="sCountry"></select>'
+    +   '<div class="gnewrow" id="sCNewRow" hidden><input type="text" id="sCNewName" placeholder="输入新国家 / 地区名称">'
+    +   '<button class="btn" id="sCNewOk" type="button">添加</button></div></div>'
+    + '<div class="fld"><label>状态</label><div class="gchips" id="sStatusChips"></div></div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>开始时间（开始追剧日期）</label><input type="date" id="sStart" value="'+esc(isEdit?s.startDate||"":"")+'"></div>'
+    +   '<div class="fld"><label>结束时间（看完日期）</label><input type="date" id="sEnd" value="'+esc(isEdit?s.endDate||"":"")+'"></div>'
+    + '</div>'
+    + '<div style="color:var(--dim2);font-size:11.5px;margin:0 0 13px;margin-top:-6px">起止日期将计入侧栏「观看热力」</div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>总集数</label><input type="number" id="sTotalEp" min="0" step="1" value="'+esc(isEdit&&s.totalEp?s.totalEp:"")+'" placeholder="如 16"></div>'
+    +   '<div class="fld"><label>已看集数</label><input type="number" id="sWatchedEp" min="0" step="1" value="'+esc(isEdit&&s.watchedEp?s.watchedEp:"")+'" placeholder="如 5"></div>'
+    + '</div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>评分（6-10，选填）</label><input type="number" id="sRating" step="0.1" min="6" max="10" value="'+esc(isEdit&&s.rating?fmtRating(s.rating):"")+'" placeholder="如 8.5"></div>'
+    +   '<div class="fld"><label>评级（1-5 星）</label><select id="sStars">'
+    +     [[0,"未评级"],["1","★ 1 星"],["2","★★ 2 星"],["3","★★★ 3 星"],["4","★★★★ 4 星"],["5","★★★★★ 5 星"]].map(p=>'<option value="'+p[0]+'"'+(isEdit&&(s.stars||0)==p[0]?" selected":"")+'>'+p[1]+'</option>').join("")
+    +   '</select></div>'
+    + '</div>'
+    + '<div class="fld"><label>评价</label><textarea id="sReview" placeholder="追剧感受、推荐语…（选填）">'+esc(isEdit?s.review||"":"")+'</textarea></div>'
+    + '<div class="fld"><label>简介</label><textarea id="sSynopsis" placeholder="剧情简介、看点备注…">'+esc(isEdit?s.synopsis||"":"")+'</textarea></div>'
+    + '<div class="fld"><label>封面</label><div class="coverbox">'
+    +   '<div class="cthumb" id="fThumb">'+(pendingCover?'<img src="'+pendingCover+'" alt="">':'暂无')+'</div>'
+    +   '<div class="coverbtns">'
+    +     '<button class="btn" id="fPickCover" type="button">选择封面图片</button>'
+    +     '<button class="btn ghost" id="fClearCover" type="button">清除封面</button>'
+    +   '</div></div></div>'
+    + '<div class="fld"><label>关联演员</label><div class="actorpick">'
+    +   '<div class="picked" id="pickedActors"></div>'
+    +   '<div class="pickrow">'
+    +     '<select id="actorSel"><option value="">选择已有演员…</option></select>'
+    +     '<input type="text" id="newActorName" placeholder="或输入新演员姓名">'
+    +     '<button class="btn" id="btnNewActor" type="button">新增</button>'
+    +   '</div></div></div>'
+    + '<div class="facts">'
+    +   '<button class="btn ghost" id="sCancel" type="button">取消</button>'
+    +   '<button class="btn primary" id="sSave" type="button">'+(isEdit?"保存修改":"保存剧集")+'</button>'
+    + '</div></div>', true
+  );
+  renderPicked();
+  initDateSel("s", isEdit ? s : null);
+  initCountrySel("s", isEdit ? s.country : "");
+  renderGenreChips("s");
+  renderStatusChips("s", st0);
+  $id("sGNewOk").onclick = ()=>addCustomGenre("s");
+  $id("sGNewName").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); addCustomGenre("s"); } });
+  $id("fPickCover").onclick = ()=>$id("posterSingle").click();
+  $id("fClearCover").onclick = ()=>{ pendingCover = ""; $id("fThumb").innerHTML = "暂无"; };
+  $id("actorSel").onchange = function(){
+    if(!this.value) return;
+    if(!formActors.includes(this.value)) formActors.push(this.value);
+    this.value = ""; renderPicked();
+  };
+  $id("btnNewActor").onclick = addNewActor;
+  $id("newActorName").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); addNewActor(); } });
+  $id("sCancel").onclick = closeSheet;
+  $id("sSave").setAttribute("data-edit", isEdit ? s.id : "");
+  $id("sSave").onclick = submitSeries;
+}
+function submitSeries(){
+  const title = $id("sTitle").value.trim();
+  if(!title){ toast("剧名为必填项", true); return; }
+  const totalEp = Number($id("sTotalEp").value) || 0;
+  const watchedEp = Number($id("sWatchedEp").value) || 0;
+  if(watchedEp > 0 && totalEp > 0 && watchedEp > totalEp){ toast("已看集数不能超过总集数", true); return; }
+  const ratingRaw = $id("sRating").value.trim();
+  if(ratingRaw !== ""){
+    const r = Number(ratingRaw);
+    if(isNaN(r) || r < 6 || r > 10){ toast("评分需在 6-10 之间，或不填", true); return; }
+  }
+  const startDate = validDateOrEmpty($id("sStart").value);
+  const endDate = validDateOrEmpty($id("sEnd").value);
+  // 发行日期完整性：只选了月/日而没选年时，保存会静默丢值，必须提示
+  if(!$id("sDy").value && ($id("sDm").value || $id("sDd").value)){
+    toast("发行日期不完整：请补选年份（月、日可留空）", true); return;
+  }
+  if(startDate && startDate > todayStr()){ toast("开始时间不能晚于今天", true); return; }
+  if(endDate && endDate > todayStr()){ toast("结束时间不能晚于今天", true); return; }
+  if(startDate && endDate && endDate < startDate){ toast("结束时间不能早于开始时间", true); return; }
+  const editId = $id("sSave").getAttribute("data-edit") || "";
+  const isNew = !editId;
+  const s = seriesById(editId) || { id:uid("se"), added:Date.now(), cover:"", actors:[] };
+  s.title = title;
+  s.releaseDate = readDateSel("s");
+  s.year = s.releaseDate ? s.releaseDate.slice(0,4) : (isNew ? "" : (s.year||""));
+  s.genre = genreStrOf("s");
+  s.country = readCountrySel("s", s.country);
+  s.status = readStatusChips("s");
+  s.startDate = startDate;
+  s.endDate = endDate;
+  s.totalEp = totalEp;
+  s.watchedEp = watchedEp;
+  s.rating = ratingRaw === "" ? 0 : Number(ratingRaw);
+  s.stars = Number($id("sStars").value) || 0;
+  s.review = $id("sReview").value.trim();
+  s.synopsis = $id("sSynopsis").value.trim();
+  s.cover = pendingCover;
+  s.actors = formActors.slice();
+  if(isNew) db.series.unshift(s);
+  saveDB(); closeSheet(); refreshAll();
+  toast(isNew ? "剧集《"+title+"》已收录" : "剧集已更新");
+}
+function openSeriesDetail(id){
+  const s = seriesById(id); if(!s) return;
+  const stars = (s.actors||[]).map(aid=>actorById(aid)).filter(Boolean);
+  const prog = s.totalEp
+    ? '<div class="v">'+(s.watchedEp||0)+' / '+s.totalEp+' 集'
+      + (s.status==="在看" ? '<button class="copy" id="btnEpPlus" type="button">＋ 看完一集</button>' : '')
+      + '</div>'
+    : '<div class="v">（未填写）</div>';
+  openSheet(
+    '<div class="detail">'
+    + '<div class="visual">'+(s.cover?'<img src="'+s.cover+'" alt="'+esc(s.title)+'">':PLACEHOLDER)+'</div>'
+    + '<div class="info">'
+    +   '<h2>'+esc(s.title)+statusBadge(s.status,' style="position:static;display:inline-block;margin-left:8px"')+'</h2>'
+    +   '<div class="meta">'+[fmtDateDisp(s.releaseDate)||(s.year?s.year+"年":"年份未知"), s.country||"", s.genre||"类型未填"].filter(Boolean).join(" · ")+'</div>'
+    +   (s.rating||s.stars
+        ? '<div style="margin:8px 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+          + (s.stars ? starRow(s.stars) : '')
+          + (s.rating ? '<span style="color:var(--gold2);font-weight:600">★ '+fmtRating(s.rating)+'</span><span style="color:var(--dim2);font-size:11.5px">（6-10 分制）</span>' : '')
+          + '</div>' : '')
+    +   '<p class="note">'+(esc(s.synopsis)||"（暂无简介）")+'</p>'
+    +   (s.review ? '<div class="secttl">我的评价</div><div class="reviewbox">'+esc(s.review)+'</div>' : '')
+    +   '<div class="kv">'
+    +     '<div class="k">观看进度</div>'+prog
+    +     '<div class="k">国家 / 地区</div><div class="v">'+(esc(s.country)||"（未填写）")+'</div>'
+    +     '<div class="k">发行日期</div><div class="v">'+(fmtDateDisp(s.releaseDate)||(s.year?s.year+"年":"（未填写）"))+'</div>'
+    +     '<div class="k">开始时间</div><div class="v">'+(s.startDate||"（未填写）")+'</div>'
+    +     '<div class="k">结束时间</div><div class="v">'+(s.endDate||"（未填写）")+'</div>'
+    +     '<div class="k">录入时间</div><div class="v">'+(s.added?new Date(s.added).toLocaleDateString("zh-CN"):"—")+'</div>'
+    +   '</div>'
+    +   '<div class="secttl">关联演员</div>'
+    +   '<div class="starchips">'+(stars.length
+          ? stars.map(a=>'<button type="button" class="starchip" data-actor="'+esc(a.id)+'">'+esc(a.name)+'</button>').join("")
+          : '<span style="color:var(--dim2);font-size:12.5px">尚未关联演员</span>')+'</div>'
+    +   '<div class="acts" style="margin-top:18px">'
+    +     '<button class="btn'+(s.status==="已看"?"":" watched-cta")+'" id="seWatch" type="button">'
+    +       (s.status==="已看" ? "✓ 已看完 · 点击取消标记" : "标记为已看完")+'</button>'
+    +     '<button class="btn primary" id="seEdit" type="button">编辑</button>'
+    +     '<button class="btn danger" id="seDel" type="button">删除剧集</button>'
+    +   '</div>'
+    + '</div></div>'
+  );
+  Array.prototype.forEach.call($id("sheet").querySelectorAll(".starchip"), b=>{
+    b.onclick = ()=>openActorDetail(b.getAttribute("data-actor"));
+  });
+  const ep = $id("btnEpPlus");
+  if(ep) ep.onclick = ()=>{
+    s.watchedEp = Math.min((s.watchedEp||0)+1, s.totalEp||9999);
+    if(s.totalEp && s.watchedEp >= s.totalEp && s.status==="在看"){
+      s.status = "已看";
+      if(!s.endDate) s.endDate = todayStr();
+    }
+    saveDB(); refreshAll(); openSeriesDetail(s.id);
+    toast(s.status==="已看" ? "已看完整部剧集，状态自动更新为「已看」" : "进度已更新至 "+s.watchedEp+" 集");
+  };
+  $id("seWatch").onclick = ()=>{
+    s.status = s.status==="已看" ? "" : "已看";
+    if(s.status==="已看" && !s.endDate) s.endDate = todayStr();
+    saveDB(); refreshAll(); openSeriesDetail(s.id);
+    toast(s.status==="已看" ? "已标记为已看完" : "已取消已看完标记");
+  };
+  $id("seEdit").onclick = ()=>openSeriesForm(s);
+  $id("seDel").onclick = ()=>{
+    if(!confirm("确定删除剧集《"+s.title+"》吗？此操作不可恢复。")) return;
+    db.series = db.series.filter(x=>x.id!==s.id);
+    saveDB(); closeSheet(); refreshAll(); toast("已删除剧集");
+  };
+}
+
+/* ========= 视频文件关联与页内播放 ========= */
+const VIDEO_EXT = ["mp4","mkv","avi","rmvb","rm","mov","wmv","flv","m4v","ts","mpg","mpeg","webm","m2ts"];
+function videoMetaFromFile(f){
+  const mm = String(f.name||"").toLowerCase().match(/\.([a-z0-9]+)$/);
+  const ext = mm ? mm[1] : "";
+  if(VIDEO_EXT.indexOf(ext) < 0 && !/^video\//.test(f.type)) return null;
+  return { name:f.name, size:f.size, ext:ext||"bin", lastModified:f.lastModified };
+}
+const FILM_ICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:16px;height:16px;flex:0 0 auto;opacity:.6"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 8h18M7 4v4M11 4v4M15 4v4M19 4v4M7 16v4M17 16v4M3 16h18"></path></svg>';
+function renderVfile(){
+  const box = $id("vfileBox"); if(!box) return;
+  if(!pendingVideoMeta){ box.innerHTML = '<span style="color:var(--dim2);font-size:12.5px">未选择视频文件（仅保存文件名、容量等元数据，不复制文件本身）</span>'; return; }
+  box.innerHTML = '<div class="vfile">'+FILM_ICO+'<b>'+esc(pendingVideoMeta.name)+'</b>'
+    + '<span>'+fmtBytes(pendingVideoMeta.size)+' · '+esc(String(pendingVideoMeta.ext).toUpperCase())+'</span>'
+    + '<button class="btn ghost" id="fClearVideo" type="button">清除关联</button></div>';
+  $id("fClearVideo").onclick = ()=>{ pendingVideoMeta = null; pendingVideoFile = null; renderVfile(); };
+}
+function playMovieVideo(m){
+  if(!m.video){ toast("该影片尚未关联视频文件，请先在编辑表单中从磁盘选择", true); return; }
+  const f = videoFiles.get(m.id);
+  if(f){ startBlobPlay(m, f); return; }
+  $id("videoPlayPick").setAttribute("data-target", m.id);
+  $id("videoPlayPick").click();
+}
+function startBlobPlay(m, f){
+  stopBlobPlay();
+  const vis = $id("dVisual"); if(!vis) return;
+  lastBlobUrl = URL.createObjectURL(f);
+  vis.innerHTML = '<video controls autoplay src="'+lastBlobUrl+'" style="width:100%;height:100%;max-height:420px;background:#000;display:block"></video>';
+  const v = vis.querySelector("video");
+  if(v) v.onerror = function(){
+    stopBlobPlay();
+    toast("浏览器不支持页内播放该格式（如 MKV / AVI），请在本地用播放器打开", true);
+    openMovieDetail(m.id);
+  };
+}
+function stopBlobPlay(){
+  if(lastBlobUrl){ try{ URL.revokeObjectURL(lastBlobUrl); }catch(e){} lastBlobUrl = ""; }
+}
+
+/* ========= 演员表单 ========= */
+let pendingAvatar = "";
+function openActorForm(a){
+  const isEdit = !!a;
+  pendingAvatar = isEdit ? (a.avatar||"") : "";
+  openSheet(
+    '<div class="form"><h2>'+(isEdit?"编辑演员":"新增演员")+'</h2>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>姓名 *</label><input type="text" id="aName" value="'+esc(isEdit?a.name:"")+'" placeholder="中文名"></div>'
+    +   '<div class="fld"><label>英文名</label><input type="text" id="aEn" value="'+esc(isEdit?a.enName||"":"")+'" placeholder="英文名"></div>'
+    + '</div>'
+    + '<div class="fld"><label>别名 / 又名</label><input type="text" id="aAlias" value="'+esc(isEdit?a.alias||"":"")+'" placeholder="多个别名用 / 分隔"></div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>性别</label><select id="aGender">'
+    +     [["","未填写"],["男","男"],["女","女"]].map(p=>'<option value="'+p[0]+'"'+(isEdit&&a.gender===p[0]?" selected":"")+'>'+p[1]+'</option>').join("")
+    +   '</select></div>'
+    +   '<div class="fld"><label>生日</label><input type="date" id="aBirth" value="'+esc(isEdit?a.birth||"":"")+'"></div>'
+    + '</div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>血型</label><select id="aBlood">'
+    +     [["","未填写"],["A","A"],["B","B"],["O","O"],["AB","AB"]].map(p=>'<option value="'+p[0]+'"'+(isEdit&&a.blood===p[0]?" selected":"")+'>'+p[1]+'</option>').join("")
+    +   '</select></div>'
+    +   '<div class="fld"><label>国籍</label><input type="text" id="aCountry" list="countryList" value="'+esc(isEdit?a.country||"":"")+'" placeholder="选择已有国家，或输入新增">'
+    +   '</div>'
+    + '</div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>出生地</label><input type="text" id="aBirthplace" value="'+esc(isEdit?a.birthplace||"":"")+'" placeholder="如 中国·北京"></div>'
+    +   '<div class="fld"><label>职业</label><input type="text" id="aJob" value="'+esc(isEdit?a.job||"":"")+'" placeholder="如 演员 / 导演"></div>'
+    + '</div>'
+    + '<div class="frow">'
+    +   '<div class="fld"><label>所属机构 / 厂牌</label><input type="text" id="aAgency" value="'+esc(isEdit?a.agency||"":"")+'" placeholder="选填"></div>'
+    +   '<div class="fld"><label>出道时间</label><input type="text" id="aDebut" value="'+esc(isEdit?a.debut||"":"")+'" placeholder="如 2007"></div>'
+    + '</div>'
+    + '<div class="fld"><label>简介</label><textarea id="aBio" placeholder="代表作品、获奖情况等">'+esc(isEdit?a.bio||"":"")+'</textarea></div>'
+    + '<div class="fld"><label>封面照片（圆形头像）</label><div class="coverbox">'
+    +   '<div class="cthumb" id="aThumb" style="width:64px;height:64px;border-radius:50%;overflow:hidden">'
+    +     (pendingAvatar?'<img src="'+pendingAvatar+'" style="width:100%;height:100%;object-fit:cover">':'暂无')
+    +   '</div>'
+    +   '<div class="coverbtns">'
+    +     '<button class="btn" id="aPickAvatar" type="button">选择头像照片</button>'
+    +     '<button class="btn ghost" id="aClearAvatar" type="button">清除头像</button>'
+    +   '</div></div></div>'
+    + '<div class="facts">'
+    +   '<button class="btn ghost" id="aCancel" type="button">取消</button>'
+    +   '<button class="btn primary" id="aSave" type="button">'+(isEdit?"保存修改":"保存演员")+'</button>'
+    + '</div></div>', true
+  );
+  // 国籍下拉：预置国家 + 历史输入过的国家，新输入的国家保存后自动记忆
+  const knownC = (()=>{ const s = new Set(PRESET_COUNTRIES); db.countries.forEach(c=>s.add(c)); db.actors.forEach(a=>{ if(a.country) s.add(a.country); }); return [...s]; })().sort((a,b)=>a.localeCompare(b,"zh"));
+  const cl = document.createElement("datalist");
+  cl.id = "countryList";
+  cl.innerHTML = knownC.map(c=>'<option value="'+esc(c)+'">').join("");
+  $id("aCountry").appendChild(cl);
+  $id("aSave").setAttribute("data-edit", isEdit?a.id:"");
+  $id("aPickAvatar").onclick = ()=>{ $id("avatarPick").removeAttribute("data-target"); $id("avatarPick").click(); };
+  $id("aClearAvatar").onclick = ()=>{ pendingAvatar = ""; $id("aThumb").innerHTML = "暂无"; };
+  $id("aCancel").onclick = closeSheet;
+  $id("aSave").onclick = submitActor;
+}
+function submitActor(){
+  const name = $id("aName").value.trim();
+  if(!name){ toast("姓名为必填项", true); return; }
+  const birth = $id("aBirth").value;
+  if(birth && !/^\d{4}-\d{2}-\d{2}$/.test(birth)){ toast("生日格式不正确", true); return; }
+  const editId = $id("aSave").getAttribute("data-edit");
+  const a = actorById(editId) || { id:uid("a"), photos:[], added:Date.now() };
+  a.name = name;
+  a.enName = $id("aEn").value.trim();
+  a.alias = $id("aAlias").value.trim();
+  a.gender = $id("aGender").value;
+  a.birth = birth;
+  a.blood = $id("aBlood").value;
+  a.country = $id("aCountry").value.trim();
+  // 国家记忆：新国家自动入主数据，后续可重复选择
+  if(a.country && db.countries.indexOf(a.country) < 0){ db.countries.push(a.country); toast("已保存新国籍「"+a.country+"」"); }
+  a.birthplace = $id("aBirthplace").value.trim();
+  a.job = $id("aJob").value.trim();
+  a.agency = $id("aAgency").value.trim();
+  a.debut = $id("aDebut").value.trim();
+  a.bio = $id("aBio").value.trim();
+  a.avatar = pendingAvatar;
+  if(!db.actors.includes(a)) db.actors.push(a);
+  saveDB(); closeSheet(); refreshAll();
+  toast("演员「"+name+"」已保存");
+}
+
+/* ========= 照片管理（相册上传 / 预览 / 排序 / 删除 / 设封面） ========= */
+function uploadPhotos(a, files){
+  const list = Array.prototype.filter.call(files, f=>/image\/(jpeg|png|webp)/.test(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name));
+  if(!list.length){ toast("未选中有效的图片文件（支持 jpg / png / webp）", true); return; }
+  const oversize = list.filter(f=>f.size > 15*1048576);
+  if(oversize.length){ toast("有 "+oversize.length+" 张照片超过 15MB，请压缩后再上传", true); return; }
+  let done = 0, failed = 0;
+  list.forEach(f=>{
+    compressImage(f, 800, 0.72, (dataUrl)=>{
+      done++;
+      if(dataUrl) a.photos.push({ id:uid("p"), src:dataUrl });
+      else failed++;
+      if(done === list.length){
+        if(!a.avatar && a.photos.length) a.avatar = a.photos[0].src;
+        saveDB(); openPhotoManager(a);
+        toast("已上传 "+(list.length-failed)+" 张照片" + (failed?("，"+failed+" 张读取失败"):""));
+      }
+    });
+  });
+}
+function openPhotoManager(a){
+  openSheet(
+    '<div class="form slim"><h2 style="font-size:18px">照片管理 · '+esc(a.name)+'</h2>'
+    + '<div class="hintbox">支持 jpg / png / webp，单张不超过 <b>15MB</b>（自动压缩存档）；<b>悬停照片</b>可设为封面、左右移动排序、删除；<b>点击照片</b>可放大预览。</div>'
+    + '<div class="acts" style="margin-bottom:14px">'
+    + '<button class="btn primary" id="btnUpPhotos" type="button">上传照片（可多选）</button>'
+    + '<button class="btn ghost" id="btnPmClose" type="button">完成</button></div>'
+    + '<div class="photo-grid">'+(a.photos.length
+        ? a.photos.map((p,i)=>'<div class="photo-item">'
+            + (p.src===a.avatar?'<span class="covmark">封面</span>':'')
+            + '<img src="'+p.src+'" alt="" data-lb="'+i+'" loading="lazy">'
+            + '<div class="pacts">'
+            +   '<button class="pbtn" type="button" data-setcov="'+i+'">'+(p.src===a.avatar?'换封面':'设封面')+'</button>'
+            +   '<button class="pbtn" type="button" data-mvup="'+i+'">←</button>'
+            +   '<button class="pbtn" type="button" data-mvdn="'+i+'">→</button>'
+            +   '<button class="pbtn del" type="button" data-delp="'+i+'">删</button>'
+            + '</div></div>').join("")
+        : '<span style="color:var(--dim2);font-size:12.5px">暂无照片，点上方按钮上传</span>')+'</div>'
+    + '</div>', true
+  );
+  $id("btnUpPhotos").onclick = ()=>$id("photoPick").click();
+  $id("btnPmClose").onclick = ()=>openActorDetail(a.id);
+  $id("photoPick").setAttribute("data-target", a.id);
+  const sheet = $id("sheet");
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-lb]"), b=>{
+    b.onclick = ()=>openLightbox(a, +b.getAttribute("data-lb"));
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-setcov]"), b=>{
+    b.onclick = ()=>{ a.avatar = a.photos[+b.getAttribute("data-setcov")].src;
+      saveDB(); openPhotoManager(a); toast("已设置封面照片"); };
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-mvup]"), b=>{
+    b.onclick = ()=>movePhoto(a, +b.getAttribute("data-mvup"), -1);
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-mvdn]"), b=>{
+    b.onclick = ()=>movePhoto(a, +b.getAttribute("data-mvdn"), 1);
+  });
+  Array.prototype.forEach.call(sheet.querySelectorAll("[data-delp]"), b=>{
+    b.onclick = ()=>{
+      const i = +b.getAttribute("data-delp");
+      if(!confirm("确定删除这张照片吗？")) return;
+      const rm = a.photos.splice(i,1)[0];
+      if(rm && rm.src===a.avatar) a.avatar = a.photos.length ? a.photos[0].src : "";
+      saveDB(); openPhotoManager(a); toast("照片已删除");
+    };
+  });
+}
+
+/* ========= 大图预览 ========= */
+let lbActor = null, lbIdx = 0;
+function openLightbox(a, i){
+  lbActor = a; lbIdx = i;
+  renderLightbox();
+  $id("lightbox").classList.add("on");
+}
+function renderLightbox(){
+  const a = lbActor; if(!a) return;
+  const p = a.photos[lbIdx];
+  $id("lightbox").innerHTML =
+    '<img src="'+(p?p.src:"")+'" alt="">'
+    + '<div class="lb-acts">'
+    + '<button class="btn ghost" id="lbPrev" type="button">‹ 上一张</button>'
+    + '<span class="lb-idx">'+(lbIdx+1)+' / '+a.photos.length+' · '+esc(a.name)+'</span>'
+    + '<button class="btn ghost" id="lbNext" type="button">下一张 ›</button>'
+    + '<button class="btn" id="lbClose" type="button">关闭</button>'
+    + '</div>';
+  $id("lbPrev").onclick = ()=>{ lbIdx = (lbIdx-1+a.photos.length)%a.photos.length; renderLightbox(); };
+  $id("lbNext").onclick = ()=>{ lbIdx = (lbIdx+1)%a.photos.length; renderLightbox(); };
+  $id("lbClose").onclick = closeLightbox;
+}
+function closeLightbox(){ $id("lightbox").classList.remove("on"); $id("lightbox").innerHTML = ""; lbActor = null; }
+$id("lightbox").onclick = function(e){ if(e.target === $id("lightbox")) closeLightbox(); };
+document.addEventListener("keydown", e=>{
+  if(!$id("lightbox").classList.contains("on")) return;
+  if(e.key==="Escape") closeLightbox();
+  if(e.key==="ArrowLeft" && lbActor){ lbIdx=(lbIdx-1+lbActor.photos.length)%lbActor.photos.length; renderLightbox(); }
+  if(e.key==="ArrowRight" && lbActor){ lbIdx=(lbIdx+1)%lbActor.photos.length; renderLightbox(); }
+});
+
+/* ========= 封面：压缩 + 按片名匹配 ========= */
+function compressImage(file, maxW, q, cb){
+  const reader = new FileReader();
+  reader.onload = function(){
+    const img = new Image();
+    img.onload = function(){
+      const scale = Math.min(1, maxW / img.width);
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      cb(c.toDataURL("image/jpeg", q));
+    };
+    img.onerror = ()=>cb("");
+    img.src = reader.result;
+  };
+  reader.onerror = ()=>cb("");
+  reader.readAsDataURL(file);
+}
+function matchCovers(files){
+  const jobs = [];
+  Array.prototype.forEach.call(files, f=>{
+    if(!/image\//.test(f.type) && !/\.(jpe?g|png|webp)$/i.test(f.name)) return;
+    jobs.push({ file:f, name:normName(f.name) });
+  });
+  if(!jobs.length){ toast("未选中有效的图片文件", true); return; }
+  let done = 0, hit = 0;
+  jobs.forEach(j=>{
+    compressImage(j.file, 480, 0.72, (dataUrl)=>{
+      done++;
+      if(dataUrl){
+        const target = db.movies.find(m=>normName(m.title)===j.name)
+          || db.movies.find(m=>j.name.indexOf(normName(m.title))>=0 && normName(m.title).length>=2);
+        if(target){ target.cover = dataUrl; hit++; }
+      }
+      if(done === jobs.length){
+        saveDB(); refreshAll();
+        toast("封面匹配完成：成功 "+hit+" 部，未匹配 "+(jobs.length-hit)+" 张" + (hit?"（可手动逐部指定）":""));
+      }
+    });
+  });
+}
+
+/* ========= 数据菜单：导出 / 导入 / 清空 ========= */
+function bakeData(){
+  const node = $id("lib-data");
+  if(node) node.textContent = JSON.stringify(db).replace(/</g,"\\u003c");
+}
+function download(name, blob){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+function exportHTML(){
+  closeSheet(); bakeData();
+  const keep = { grid:$id("grid").innerHTML, chips:$id("chips").innerHTML, ag:$id("actorGrid").innerHTML };
+  $id("grid").innerHTML = ""; $id("chips").innerHTML = ""; $id("actorGrid").innerHTML = "";
+  const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  $id("grid").innerHTML = keep.grid; $id("chips").innerHTML = keep.chips; $id("actorGrid").innerHTML = keep.ag;
+  download("影匣备份-"+new Date().toISOString().slice(0,10)+".html", new Blob([html],{type:"text/html;charset=utf-8"}));
+  toast("已导出备份 HTML（双击即可在其他电脑恢复全部数据）");
+}
+function exportJSON(){
+  download("影匣数据-"+new Date().toISOString().slice(0,10)+".json",
+    new Blob([JSON.stringify(db,null,2)],{type:"application/json"}));
+  toast("已导出 JSON 数据文件");
+}
+function importJSON(file){
+  const r = new FileReader();
+  r.onload = function(){
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || !Array.isArray(d.movies) || !Array.isArray(d.actors)) throw new Error("格式不符");
+      if(!confirm("导入将覆盖当前全部数据（影片 "+d.movies.length+" 部、演员 "+d.actors.length+" 位），确定继续吗？")) return;
+      db = d; saveDB(); view.status = "全部"; view.genre = "全部"; view.country = "全部"; view.q = ""; $id("q").value = "";
+      refreshAll(); toast("数据导入成功");
+    }catch(e){ toast("导入失败：文件格式不正确", true); }
+  };
+  r.readAsText(file);
+}
+function openDataMenu(){
+  openSheet(
+    '<div class="form slim"><h2 style="font-size:18px">数据管理</h2>'
+    + '<div class="hintbox">数据保存在<b>本机浏览器</b>中（当前占用约 <b>'+(JSON.stringify(db).length/1048576).toFixed(2)+' MB</b>；照片越多占用越大，超出上限时将无法保存，请及时导出备份）。换电脑、重装系统或清理浏览器数据前，请先导出备份；导出的 <b>HTML 备份</b> 双击即可直接恢复使用。</div>'
+    + '<div class="menu">'
+    + '<button class="btn primary" id="mHtml" type="button">导出备份（HTML，含全部数据）</button>'
+    + '<button class="btn" id="mJson" type="button">导出数据（JSON 文件）</button>'
+    + '<button class="btn" id="mImport" type="button">从 JSON 文件导入（覆盖当前数据）</button>'
+    + '<button class="btn danger" id="mClear" type="button">清空全部数据</button>'
+    + '</div></div>', true
+  );
+  $id("mHtml").onclick = exportHTML;
+  $id("mJson").onclick = exportJSON;
+  $id("mImport").onclick = ()=>$id("importPick").click();
+  $id("mClear").onclick = ()=>{
+    if(!confirm("确定清空全部影片与演员数据吗？此操作不可恢复，建议先导出备份。")) return;
+    if(!confirm("再次确认：真的要清空吗？")) return;
+    db = { movies:[], actors:[], series:[], directors:[], countries:[] }; saveDB(); closeSheet(); refreshAll(); toast("数据已清空");
+  };
+}
+
+/* ========= 匹配封面说明弹窗 ========= */
+function openMatchHint(){
+  const pending = db.movies.filter(m=>!m.cover).length;
+  openSheet(
+    '<div class="form slim"><h2 style="font-size:18px">按片名匹配封面</h2>'
+    + '<div class="hintbox">把封面图片（jpg / png / webp）准备好，<b>文件名与片名一致</b>（如「肖申克的救赎.jpg」对应《肖申克的救赎》），点下方按钮一次选中多张图片即可自动匹配上墙。图片会自动压缩后存入本页面。当前有 <b>'+pending+'</b> 部影片待补封面。</div>'
+    + '<div class="facts" style="justify-content:flex-start">'
+    + '<button class="btn primary" id="mGo" type="button">选择封面图片</button></div></div>', true
+  );
+  $id("mGo").onclick = ()=>$id("posterMatch").click();
+}
+
+/* ========= 事件绑定与初始化 ========= */
+function bind(){
+  $id("btnAddMovie").onclick = ()=>openMovieForm(null);
+  $id("btnAddSeries").onclick = ()=>openSeriesForm(null);
+  $id("btnAddActor").onclick = ()=>openActorForm(null);
+  $id("btnData").onclick = openDataMenu;
+  $id("btnMatch").onclick = openMatchHint;
+  $id("tabMovies").onclick = ()=>{ view.tab = "movies"; view.status = "全部"; view.genre = "全部"; view.country = "全部"; setTabs(); refreshAll(); };
+  $id("tabSeries").onclick = ()=>{ view.tab = "series"; view.status = "全部"; view.genre = "全部"; view.country = "全部"; setTabs(); refreshAll(); };
+  $id("tabActors").onclick = ()=>{ view.tab = "actors"; view.status = "全部"; view.genre = "全部"; view.country = "全部"; setTabs(); refreshAll(); };
+  $id("q").addEventListener("input", function(){ view.q = this.value; refreshAll(); });
+  $id("sort").onchange = function(){ view.sort = this.value; refreshAll(); };
+  $id("posterMatch").addEventListener("change", function(){
+    if(this.files && this.files.length) matchCovers(this.files);
+    this.value = "";
+  });
+  $id("posterSingle").addEventListener("change", function(){
+    const f = this.files && this.files[0];
+    this.value = "";
+    if(!f) return;
+    compressImage(f, 480, 0.72, (dataUrl)=>{
+      if(!dataUrl){ toast("图片读取失败", true); return; }
+      pendingCover = dataUrl;
+      $id("fThumb").innerHTML = '<img src="'+dataUrl+'" alt="">';
+    });
+  });
+  $id("importPick").addEventListener("change", function(){
+    const f = this.files && this.files[0];
+    this.value = "";
+    if(f) importJSON(f);
+  });
+  $id("avatarPick").addEventListener("change", function(){
+    const target = this.getAttribute("data-target");
+    const f = this.files && this.files[0];
+    this.value = "";
+    if(!f) return;
+    if(f.size > 15*1048576){ toast("照片超过 15MB，请压缩后再上传", true); return; }
+    compressImage(f, 480, 0.78, (dataUrl)=>{
+      if(!dataUrl){ toast("图片读取失败", true); return; }
+      if(target){
+        const a = actorById(target);
+        if(a){ a.avatar = dataUrl; saveDB(); openActorDetail(target); toast("封面照片已更新"); }
+      }else{
+        pendingAvatar = dataUrl;
+        if($id("aThumb")) $id("aThumb").innerHTML = '<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover">';
+      }
+    });
+  });
+  $id("photoPick").addEventListener("change", function(){
+    const target = this.getAttribute("data-target");
+    // 注意：清空 input.value 会重置 FileList，必须先转为文件引用数组再清空
+    const fs = Array.prototype.slice.call(this.files || []);
+    this.value = "";
+    this.removeAttribute("data-target");
+    if(!target || !fs.length) return;
+    const a = actorById(target);
+    if(a) uploadPhotos(a, fs);
+  });
+  $id("videoPick").addEventListener("change", function(){
+    const f = this.files && this.files[0];
+    this.value = "";
+    if(!f) return;
+    const meta = videoMetaFromFile(f);
+    if(!meta){ toast("不支持的文件格式，请选择常见视频文件（mp4 / mkv / avi 等）", true); return; }
+    pendingVideoMeta = meta; pendingVideoFile = f;
+    renderVfile();
+  });
+  $id("videoPlayPick").addEventListener("change", function(){
+    const target = this.getAttribute("data-target");
+    const f = this.files && this.files[0];
+    this.value = "";
+    if(!f || !target) return;
+    const meta = videoMetaFromFile(f);
+    if(!meta){ toast("不支持的文件格式，无法页内播放", true); return; }
+    videoFiles.set(target, f);
+    const m = movieById(target);
+    if(m){ m.video = meta; saveDB(); startBlobPlay(m, f); }
+  });
+}
+function setTabs(){
+  $id("tabMovies").className = "tab" + (view.tab==="movies" ? " is-on" : "");
+  $id("tabSeries").className = "tab" + (view.tab==="series" ? " is-on" : "");
+  $id("tabActors").className = "tab" + (view.tab==="actors" ? " is-on" : "");
+}
+document.addEventListener("DOMContentLoaded", function(){
+  loadDB();
+  bind();
+  refreshAll();
+});
+</script>
+</body>
+</html>
